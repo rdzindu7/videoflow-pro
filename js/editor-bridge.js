@@ -342,9 +342,6 @@
       E.patch(v.id, { beatPulse: e.target.checked });
     });
 
-    // AI chat: music by name
-    const oldHandle = null;
-
     // volume labels
     $("#edVolVideo")?.addEventListener("input", (e) => {
       const sp = e.target.parentElement?.querySelector("span:last-child");
