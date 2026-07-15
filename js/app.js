@@ -305,15 +305,14 @@
       if ($("#pfHandle")) $("#pfHandle").value = (prof.handle || prof.handleAt || "").replace(/^@/, "");
       if ($("#pfName")) $("#pfName").value = prof.displayName || "";
       if ($("#pfBio")) $("#pfBio").value = prof.bio || "";
-      if ($("#pfAvatar") && prof.avatar) $("#pfAvatar").src = asset(prof.avatar);
-      if ($("#pfCoverPrev") && (prof.profileCover || prof.cover))
-        $("#pfCoverPrev").src = asset(prof.profileCover || prof.cover);
+      if ($("#pfAvatar") && prof.avatar) $("#pfAvatar").src = asset(prof.avatar) + "?v=prof2";
+      const coverSrc = prof.profileCover || prof.identity?.cover || "assets/cover-profile.jpg";
+      if ($("#pfCoverPrev")) $("#pfCoverPrev").src = asset(coverSrc) + "?v=prof2";
       if ($("#pfPreviewName")) $("#pfPreviewName").textContent = prof.displayName || "LUXECUT";
-      if ($("#pfPreviewAt")) $("#pfPreviewAt").textContent = prof.handleAt || "@luxecut";
+      if ($("#pfPreviewAt")) $("#pfPreviewAt").textContent = prof.handleAt || "@luxecut.garage";
       if ($("#pfPreviewBio")) $("#pfPreviewBio").textContent = prof.bio || "";
-      if ($("#pfAvatarDl") && prof.avatar) {
-        $("#pfAvatarDl").href = asset(prof.avatar);
-      }
+      if ($("#pfAvatarDl")) $("#pfAvatarDl").href = asset(prof.avatar || "assets/avatar-luxecut.jpg");
+      if ($("#pfCoverDl")) $("#pfCoverDl").href = asset(coverSrc);
     }
   }
 
@@ -321,18 +320,20 @@
     const P = window.LuxeProfile;
     if (!P) return toast("Perfil nao carregou");
     const nicheId = $("#nicheSelect")?.value || P.loadProfile()?.niche || "luxury_cars";
+    const existingHandle = $("#pfHandle")?.value?.trim();
+    const existingName = $("#pfName")?.value?.trim();
+    const existingBio = $("#pfBio")?.value?.trim();
+    // auto = perfil oficial padrao (seed 0); manual reusa campos se preenchidos
     const { profile, identity, niche } = P.createFullProfile({
       nicheId,
       videos,
-      handle: $("#pfHandle")?.value?.trim() || undefined,
-      displayName: $("#pfName")?.value?.trim() || undefined,
-      bio: $("#pfBio")?.value?.trim() || undefined,
+      seed: auto ? 0 : Date.now() % 1000,
+      handle: !auto && existingHandle ? existingHandle : undefined,
+      displayName: !auto && existingName ? existingName : undefined,
+      bio: !auto && existingBio ? existingBio : undefined,
     });
-    // personaliza biblioteca
     P.personalizeLibrary(videos, profile);
-    // aplica auto mix style
     if ($("#autoMixStyle") && profile.autoMixStyle) $("#autoMixStyle").value = profile.autoMixStyle;
-    // sincroniza contas tiktok label
     state.accounts.tiktok = {
       ...(state.accounts.tiktok || {}),
       connected: !!state.accounts.tiktok?.realApi || !!state.accounts.tiktok?.connected,
@@ -341,15 +342,23 @@
       bio: identity.bio,
       avatar: identity.avatar,
     };
+    state.accounts.instagram = {
+      ...(state.accounts.instagram || {}),
+      user: identity.handleAt,
+      displayName: identity.displayName,
+      bio: identity.bio,
+      avatar: identity.avatar,
+    };
     save();
     renderAll();
     refreshAccountUI();
-    toast("Perfil criado: " + identity.handleAt);
+    toast("Perfil pronto: " + identity.handleAt);
     botSay(
-      `Perfil gerado para o nicho <strong>${esc(niche.label)}</strong>:<br>` +
-        `<code>${esc(identity.handleAt)}</code> · <strong>${esc(identity.displayName)}</strong><br>` +
+      `<strong>Perfil completo gerado</strong> (${esc(niche.label)})<br>` +
+        `Nome: <strong>${esc(identity.displayName)}</strong><br>` +
+        `Usuario: <code>${esc(identity.handleAt)}</code><br>` +
         `<pre class="ai-pre">${esc(identity.bio)}</pre>` +
-        `Foto: <code>assets/avatar-luxecut.jpg</code> — baixe e use no TikTok/IG (API nao cria @ sozinha).`
+        `Foto de perfil e capa prontas — use <em>Baixar foto</em> e cole no TikTok/Instagram (Editar perfil). A API nao altera @ real.`
     );
     if (!auto) {
       $("#newAccountBanner") && ($("#newAccountBanner").style.display = "none");
@@ -360,7 +369,7 @@
   function saveCreatorProfileFields() {
     const P = window.LuxeProfile;
     if (!P) return;
-    const handle = ($("#pfHandle")?.value || "luxecut").replace(/^@/, "").trim();
+    const handle = ($("#pfHandle")?.value || "luxecut.garage").replace(/^@/, "").trim().toLowerCase();
     const displayName = ($("#pfName")?.value || "LUXECUT").trim();
     const bio = ($("#pfBio")?.value || "").trim();
     P.saveProfile({
@@ -369,7 +378,7 @@
       displayName,
       bio,
       avatar: "assets/avatar-luxecut.jpg",
-      profileCover: "covers/luxecut-brand.jpg",
+      profileCover: "assets/cover-profile.jpg",
       profileReady: true,
       onboardingDone: true,
       identity: {
@@ -379,7 +388,7 @@
         displayName,
         bio,
         avatar: "assets/avatar-luxecut.jpg",
-        cover: "covers/luxecut-brand.jpg",
+        cover: "assets/cover-profile.jpg",
       },
     });
     state.accounts.tiktok = {
@@ -387,10 +396,18 @@
       user: "@" + handle,
       displayName,
       bio,
+      avatar: "assets/avatar-luxecut.jpg",
+    };
+    state.accounts.instagram = {
+      ...(state.accounts.instagram || {}),
+      user: "@" + handle,
+      displayName,
+      bio,
+      avatar: "assets/avatar-luxecut.jpg",
     };
     save();
     refreshAccountUI();
-    toast("Perfil salvo");
+    toast("Perfil salvo: @" + handle);
   }
 
   function runNichePersonalization(forceDetect) {
@@ -1438,23 +1455,35 @@
       refreshAccountUI();
       toast("Nova bio");
     });
+    $("#btnRegenName")?.addEventListener("click", () => {
+      const p = window.LuxeProfile?.regenerateIdentity("name");
+      refreshAccountUI();
+      toast(p?.displayName || "Novo nome");
+    });
     $("#btnCopyProfile")?.addEventListener("click", () => {
       const p = window.LuxeProfile?.loadProfile();
       if (!p) return;
-      const text = `${p.displayName || ""}\n${p.handleAt || ""}\n\n${p.bio || ""}\n\nFoto: baixe avatar-luxecut.jpg no LUXECUT`;
+      const text =
+        `NOME: ${p.displayName || "LUXECUT"}\n` +
+        `USUARIO: ${p.handleAt || "@luxecut.garage"}\n\n` +
+        `BIO:\n${p.bio || ""}\n\n` +
+        `FOTO: baixe no LUXECUT (Baixar foto / Baixar capa)\n` +
+        `Cole no TikTok e Instagram → Editar perfil`;
       navigator.clipboard?.writeText(text).then(
-        () => toast("Perfil copiado"),
+        () => toast("Perfil copiado — cole no app"),
         () => prompt("Copie:", text)
       );
     });
-    // auto-gerar perfil se conta nova e ainda nao tem
+    // sempre gera perfil completo se ainda nao existir
     setTimeout(() => {
       const P = window.LuxeProfile;
-      if (P && P.isNewAccount() && !P.loadProfile()?.profileReady) {
-        // nao forca ate usuario abrir, mas preenche preview
+      if (!P) return;
+      if (!P.loadProfile()?.profileReady) {
+        createCreatorProfile(true);
+      } else {
         refreshAccountUI();
       }
-    }, 400);
+    }, 350);
     $("#btnReassignCovers")?.addEventListener("click", reassignCovers);
     $("#btnReassignCovers2")?.addEventListener("click", reassignCovers);
     $("#btnSimGrowth")?.addEventListener("click", () => {

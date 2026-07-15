@@ -193,27 +193,30 @@
               <div class="creator-profile">
                 <img id="pfAvatar" src="assets/avatar-luxecut.jpg" alt="avatar" />
                 <div class="creator-main">
-                  <div class="field"><label>@ usuario</label><input id="pfHandle" placeholder="luxecut.garage" /></div>
-                  <div class="field"><label>Nome de exibicao</label><input id="pfName" placeholder="LUXECUT Garage" /></div>
-                  <div class="field"><label>Bio / descricao</label><textarea id="pfBio" rows="3" placeholder="Bio curta..."></textarea></div>
+                  <div class="field"><label>@ usuario</label><input id="pfHandle" placeholder="luxecut.garage" autocomplete="off" /></div>
+                  <div class="field"><label>Nome de exibicao</label><input id="pfName" placeholder="LUXECUT" autocomplete="off" /></div>
+                  <div class="field"><label>Bio / descricao</label><textarea id="pfBio" rows="4" placeholder="Bio curta para TikTok e Instagram..."></textarea></div>
                   <div style="display:flex;flex-wrap:wrap;gap:8px">
                     <button class="btn sm" type="button" id="btnSaveProfile">Salvar perfil</button>
                     <button class="btn ghost sm" type="button" id="btnRegenHandle">Novo @</button>
+                    <button class="btn ghost sm" type="button" id="btnRegenName">Novo nome</button>
                     <button class="btn ghost sm" type="button" id="btnRegenBio">Nova bio</button>
                     <button class="btn ghost sm" type="button" id="btnCopyProfile">Copiar tudo</button>
                     <a class="btn ghost sm" id="pfAvatarDl" href="assets/avatar-luxecut.jpg" download="luxecut-avatar.jpg">Baixar foto</a>
+                    <a class="btn ghost sm" id="pfCoverDl" href="assets/cover-profile.jpg" download="luxecut-capa.jpg">Baixar capa</a>
                   </div>
                   <div class="note" style="margin-top:10px">
-                    TikTok/Instagram nao deixam a API criar @ por voce. O LUXECUT gera @, nome, bio e foto —
-                    copie e cole no app (Editar perfil). Foto: assets/avatar-luxecut.jpg
+                    Perfil gerado automatico: @, nome, bio, foto e capa.
+                    TikTok/IG nao deixam a API mudar o @ real — use <strong>Copiar tudo</strong> + <strong>Baixar foto</strong>
+                    e cole em Editar perfil no app.
                   </div>
                 </div>
                 <div class="creator-preview">
-                  <img id="pfCoverPrev" src="covers/luxecut-brand.jpg" alt="capa" />
+                  <img id="pfCoverPrev" src="assets/cover-profile.jpg" alt="capa" />
                   <div class="creator-preview-meta">
                     <strong id="pfPreviewName">LUXECUT</strong>
-                    <span id="pfPreviewAt">@luxecut</span>
-                    <p id="pfPreviewBio">Gere seu perfil</p>
+                    <span id="pfPreviewAt">@luxecut.garage</span>
+                    <p id="pfPreviewBio">Carros. Presenca. Padrao.</p>
                   </div>
                 </div>
               </div>
@@ -739,14 +742,14 @@ POST /v2/post/publish/creator_info/query/</div>
   <div class="toast" id="toast"></div>
 
   <script src="data/library.js?v=clear1"></script>
-  <script src="js/account-profile.js?v=prof1"></script>
+  <script src="js/account-profile.js?v=prof2"></script>
   <script src="js/brand.js?v=niche1"></script>
   <script src="js/music-library.js?v=clear1"></script>
   <script src="js/ai-engine.js?v=niche1"></script>
   <script src="js/auto-combine.js?v=niche1"></script>
   <script src="js/editor.js?v=niche1"></script>
   <script src="js/tiktok-api.js?v=token1"></script>
-  <script src="js/app.js?v=prof1"></script>
+  <script src="js/app.js?v=prof2"></script>
   <script src="js/editor-bridge.js?v=niche1"></script>
   <script src="js/tiktok-bridge.js?v=token1"></script>
   <script>
