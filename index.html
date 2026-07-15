@@ -22,7 +22,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="css/app.css?v=prof3" />
   <link rel="icon" href="assets/icon-luxecut.jpg" />
 </head>
 <body>
@@ -187,7 +187,10 @@
           <div class="panel" id="creatorProfileCard" style="margin-bottom:14px">
             <div class="panel-h">
               <h3>Perfil do criador (LUXECUT)</h3>
-              <button class="btn sm" type="button" id="btnCreateProfile">Gerar perfil completo</button>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <button class="btn sm" type="button" id="btnCreateProfile">Gerar perfil completo</button>
+                <button class="btn tiktok sm" type="button" id="btnApplyTikTokProfile">Aplicar no TikTok (auto)</button>
+              </div>
             </div>
             <div class="panel-b">
               <div class="creator-profile">
@@ -204,12 +207,14 @@
                     <button class="btn ghost sm" type="button" id="btnCopyProfile">Copiar tudo</button>
                     <a class="btn ghost sm" id="pfAvatarDl" href="assets/avatar-luxecut.jpg" download="luxecut-avatar.jpg">Baixar foto</a>
                     <a class="btn ghost sm" id="pfCoverDl" href="assets/cover-profile.jpg" download="luxecut-capa.jpg">Baixar capa</a>
+                    <button class="btn ghost sm" type="button" id="btnSyncTikTokRead">Ler perfil real TikTok</button>
                   </div>
-                  <div class="note" style="margin-top:10px">
-                    Perfil gerado automatico: @, nome, bio, foto e capa.
-                    TikTok/IG nao deixam a API mudar o @ real — use <strong>Copiar tudo</strong> + <strong>Baixar foto</strong>
-                    e cole em Editar perfil no app.
+                  <div class="note" style="margin-top:10px" id="pfApiLimitNote">
+                    <strong>Limite do TikTok:</strong> a API oficial so <em>le</em> o perfil — nao existe endpoint para mudar @, nome, bio ou foto.
+                    O botao <strong>Aplicar no TikTok (auto)</strong> baixa a foto, copia cada campo e abre o Editar perfil no TikTok
+                    para voce so colar (Ctrl+V) e salvar. Publicacao de videos sim e automatica apos OAuth.
                   </div>
+                  <div class="note" id="pfRealTikTok" style="margin-top:8px;display:none"></div>
                 </div>
                 <div class="creator-preview">
                   <img id="pfCoverPrev" src="assets/cover-profile.jpg" alt="capa" />
@@ -220,6 +225,27 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Overlay wizard: aplicar perfil no TikTok com o minimo de cliques -->
+          <div id="pfApplyOverlay" class="pf-apply-overlay" hidden>
+            <div class="pf-apply-card">
+              <div class="pf-apply-top">
+                <strong id="pfApplyTitle">Aplicar perfil no TikTok</strong>
+                <button type="button" class="btn ghost sm" id="pfApplyClose">Fechar</button>
+              </div>
+              <p id="pfApplyStatus" class="pf-apply-status">Preparando…</p>
+              <ol id="pfApplySteps" class="pf-apply-steps"></ol>
+              <div class="pf-apply-actions">
+                <button class="btn sm" type="button" id="pfApplyNext">Proximo passo</button>
+                <button class="btn tiktok sm" type="button" id="pfApplyOpenTT">Abrir TikTok</button>
+                <button class="btn ghost sm" type="button" id="pfApplyCopy">Copiar campo atual</button>
+              </div>
+              <p class="note" style="margin-top:10px">
+                TikTok bloqueia apps de editar o perfil sozinhos. Este assistente faz 90% automatico:
+                foto baixada + texto na area de transferencia + pagina de edicao aberta.
+              </p>
             </div>
           </div>
           <div id="emptyLibHint" class="note" style="margin-bottom:14px">
@@ -765,8 +791,8 @@ POST /v2/post/publish/creator_info/query/</div>
   <script src="js/ai-engine.js?v=niche1"></script>
   <script src="js/auto-combine.js?v=niche1"></script>
   <script src="js/editor.js?v=niche1"></script>
-  <script src="js/tiktok-api.js?v=token2"></script>
-  <script src="js/app.js?v=prof2"></script>
+  <script src="js/tiktok-api.js?v=token3"></script>
+  <script src="js/app.js?v=prof3"></script>
   <script src="js/editor-bridge.js?v=niche1"></script>
   <script src="js/tiktok-bridge.js?v=token2"></script>
   <script>

@@ -410,6 +410,268 @@
     toast("Perfil salvo: @" + handle);
   }
 
+  /** Pacote de identidade atual (campos + urls) */
+  function getIdentityPack() {
+    const P = window.LuxeProfile?.loadProfile?.() || {};
+    const handle = ($("#pfHandle")?.value || P.handle || "luxecut.garage").replace(/^@/, "").trim();
+    const displayName = ($("#pfName")?.value || P.displayName || "LUXECUT").trim();
+    const bio = ($("#pfBio")?.value || P.bio || "").trim();
+    // bio TikTok max ~80 chars — corta com aviso
+    const bioTt = bio.length > 80 ? bio.slice(0, 77) + "…" : bio;
+    const avatarUrl = asset(P.avatar || "assets/avatar-luxecut.jpg");
+    const coverUrl = asset(P.profileCover || P.identity?.cover || "assets/cover-profile.jpg");
+    return {
+      handle,
+      handleAt: "@" + handle,
+      displayName: displayName.slice(0, 30),
+      bio,
+      bioTt,
+      avatarUrl,
+      coverUrl,
+    };
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      prompt("Copie:", text);
+      return false;
+    }
+  }
+
+  async function autoDownloadUrl(url, filename) {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename || "luxecut-avatar.jpg";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(a.href);
+        a.remove();
+      }, 1500);
+      return true;
+    } catch {
+      // fallback link
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || "luxecut-avatar.jpg";
+      a.target = "_blank";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return false;
+    }
+  }
+
+  function openTikTokEditProfile(handle) {
+    // Web: pagina de edicao (login no browser se necessario)
+    const webEdit = "https://www.tiktok.com/setting";
+    const webProfile = handle
+      ? "https://www.tiktok.com/@" + handle.replace(/^@/, "")
+      : "https://www.tiktok.com/";
+    // deep links mobile / app desktop se instalado
+    const deep = [
+      "snssdk1233://user/profile",
+      "tiktok://user/profile",
+      webEdit,
+    ];
+    // tenta deep link rapido, depois web
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = deep[0];
+      document.body.appendChild(iframe);
+      setTimeout(() => iframe.remove(), 800);
+    } catch (_) {}
+    window.open(webEdit, "_blank", "noopener");
+    setTimeout(() => {
+      // segundo tab com perfil (fallback)
+      // nao força multiplas abas sempre — so se usuario pedir
+    }, 0);
+    return { webEdit, webProfile };
+  }
+
+  // wizard state
+  let pfApply = { step: 0, steps: [], pack: null };
+
+  function renderPfApplySteps() {
+    const ol = $("#pfApplySteps");
+    if (!ol) return;
+    ol.innerHTML = pfApply.steps
+      .map((s, i) => {
+        const cls = i < pfApply.step ? "done" : i === pfApply.step ? "on" : "";
+        return `<li class="${cls}"><strong>${esc(s.title)}</strong><span>${esc(s.hint)}</span></li>`;
+      })
+      .join("");
+    const cur = pfApply.steps[pfApply.step];
+    if ($("#pfApplyStatus")) {
+      $("#pfApplyStatus").textContent = cur
+        ? `Passo ${pfApply.step + 1}/${pfApply.steps.length}: ${cur.title}`
+        : "Concluido";
+    }
+    if ($("#pfApplyTitle")) {
+      $("#pfApplyTitle").textContent =
+        pfApply.step >= pfApply.steps.length ? "Perfil aplicado (quase automatico)" : "Aplicar perfil no TikTok";
+    }
+  }
+
+  async function runPfApplyStep(i) {
+    const s = pfApply.steps[i];
+    if (!s) return;
+    pfApply.step = i;
+    renderPfApplySteps();
+    if (s.action) await s.action();
+    toast(s.title);
+  }
+
+  async function startApplyTikTokProfile() {
+    // garante perfil gerado
+    const P = window.LuxeProfile;
+    if (P && !P.loadProfile()?.profileReady) createCreatorProfile(true);
+    saveCreatorProfileFields();
+
+    const pack = getIdentityPack();
+    pfApply.pack = pack;
+    pfApply.step = 0;
+    pfApply.steps = [
+      {
+        title: "Baixar foto de perfil",
+        hint: "Arquivo luxecut-avatar.jpg baixado automaticamente",
+        action: async () => {
+          await autoDownloadUrl(pack.avatarUrl, "luxecut-avatar.jpg");
+        },
+      },
+      {
+        title: "Abrir TikTok (Editar perfil)",
+        hint: "Abre a pagina de configuracoes do TikTok no navegador/app",
+        action: async () => {
+          openTikTokEditProfile(pack.handle);
+          await copyText(pack.displayName);
+        },
+      },
+      {
+        title: "Nome na area de transferencia",
+        hint: `Cole o nome: ${pack.displayName} (Ctrl+V no TikTok → Nome)`,
+        action: async () => {
+          await copyText(pack.displayName);
+        },
+      },
+      {
+        title: "Usuario @ na area de transferencia",
+        hint: `Cole o @ se disponivel: ${pack.handle} (TikTok limita troca de username)`,
+        action: async () => {
+          await copyText(pack.handle);
+        },
+      },
+      {
+        title: "Bio na area de transferencia",
+        hint: `Bio (${pack.bioTt.length}/80): cole em Biografia`,
+        action: async () => {
+          await copyText(pack.bioTt);
+        },
+      },
+      {
+        title: "Foto + salvar no TikTok",
+        hint: "No TikTok: foto → galeria → luxecut-avatar.jpg → Salvar. Pronto.",
+        action: async () => {
+          await copyText(
+            `${pack.displayName}\n@${pack.handle}\n\n${pack.bioTt}\n\nFoto: Downloads/luxecut-avatar.jpg`
+          );
+          openTikTokEditProfile(pack.handle);
+        },
+      },
+    ];
+
+    const ov = $("#pfApplyOverlay");
+    if (ov) ov.hidden = false;
+    renderPfApplySteps();
+
+    // executa passo 0 automatico (download)
+    await runPfApplyStep(0);
+    // passo 1 automatico apos 1.2s (abre TikTok)
+    setTimeout(() => runPfApplyStep(1), 1200);
+
+    botSay(
+      `<strong>Aplicar no TikTok (modo maximo permitido)</strong><br>` +
+        `A API do TikTok <em>proibe</em> apps de mudarem @/nome/bio/foto sozinhos.<br>` +
+        `Eu ja: gerei o perfil, baixei a foto e abri o TikTok com o nome copiado.<br>` +
+        `Voce so cola (Ctrl+V) em cada campo e salva.<br>` +
+        `<code>${esc(pack.handleAt)}</code> · <strong>${esc(pack.displayName)}</strong>`
+    );
+  }
+
+  async function syncRealTikTokProfile() {
+    const TT = window.TikTokAPI;
+    if (!TT) return toast("API TikTok nao carregou");
+    if (!TT.loadCfg().accessToken) {
+      toast("Conecte o TikTok (OAuth) antes de ler o perfil real");
+      setView("contas");
+      return;
+    }
+    try {
+      toast("Lendo perfil real no TikTok…");
+      let creator = null;
+      let user = null;
+      try {
+        creator = await TT.queryCreatorInfo();
+      } catch (e) {
+        console.warn(e);
+      }
+      try {
+        user = await TT.getUserInfo();
+      } catch (e) {
+        console.warn(e);
+      }
+      const d = creator?.data || {};
+      const u = user?.data?.user || user?.data || {};
+      const real = {
+        username: d.creator_username || u.username || "",
+        nickname: d.creator_nickname || u.display_name || "",
+        avatar: u.avatar_url || "",
+        bio: u.bio_description || "",
+      };
+      TT.saveCfg({
+        creatorUsername: real.username,
+        creatorNickname: real.nickname,
+        realAvatar: real.avatar,
+        realBio: real.bio,
+      });
+      const box = $("#pfRealTikTok");
+      if (box) {
+        box.style.display = "block";
+        box.innerHTML =
+          `<strong>Perfil real no TikTok (somente leitura)</strong><br>` +
+          `@${esc(real.username || "?")} · ${esc(real.nickname || "?")}<br>` +
+          `${esc(real.bio || "(sem bio na API)")}<br>` +
+          `<span style="opacity:.8">API nao permite sobrescrever esses campos. Use Aplicar no TikTok (auto).</span>`;
+      }
+      if (real.username) {
+        state.accounts.tiktok = {
+          ...(state.accounts.tiktok || {}),
+          connected: true,
+          realApi: true,
+          user: "@" + real.username,
+          displayName: real.nickname || state.accounts.tiktok?.displayName,
+        };
+        save();
+        renderAll();
+      }
+      toast(real.username ? "Perfil real: @" + real.username : "Lido (sem username)");
+      botSay(
+        `Perfil real TikTok: <code>@${esc(real.username || "?")}</code> · ${esc(real.nickname || "")}<br>` +
+          `Para mudar para o pack LUXECUT, use <strong>Aplicar no TikTok (auto)</strong> — a API so le, nao edita.`
+      );
+    } catch (e) {
+      toast(e.message || String(e));
+    }
+  }
+
   function runNichePersonalization(forceDetect) {
     const P = window.LuxeProfile;
     if (!P) return;
@@ -1445,6 +1707,32 @@
 
     $("#btnCreateProfile")?.addEventListener("click", () => createCreatorProfile(false));
     $("#btnSaveProfile")?.addEventListener("click", saveCreatorProfileFields);
+    $("#btnApplyTikTokProfile")?.addEventListener("click", () => startApplyTikTokProfile());
+    $("#btnSyncTikTokRead")?.addEventListener("click", () => syncRealTikTokProfile());
+    $("#pfApplyClose")?.addEventListener("click", () => {
+      const ov = $("#pfApplyOverlay");
+      if (ov) ov.hidden = true;
+    });
+    $("#pfApplyNext")?.addEventListener("click", async () => {
+      const next = pfApply.step + 1;
+      if (next >= pfApply.steps.length) {
+        $("#pfApplyStatus") && ($("#pfApplyStatus").textContent = "Concluido — salve no TikTok");
+        toast("Pronto — confira se salvou no TikTok");
+        pfApply.step = pfApply.steps.length;
+        renderPfApplySteps();
+        return;
+      }
+      await runPfApplyStep(next);
+    });
+    $("#pfApplyOpenTT")?.addEventListener("click", () => {
+      openTikTokEditProfile(pfApply.pack?.handle || getIdentityPack().handle);
+    });
+    $("#pfApplyCopy")?.addEventListener("click", async () => {
+      const s = pfApply.steps[pfApply.step];
+      if (s?.action) await s.action();
+      else await copyText(getIdentityPack().bioTt);
+      toast("Campo copiado");
+    });
     $("#btnRegenHandle")?.addEventListener("click", () => {
       const p = window.LuxeProfile?.regenerateIdentity("handle");
       refreshAccountUI();

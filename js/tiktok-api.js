@@ -101,9 +101,40 @@ window.TikTokAPI = (function () {
     return raw ? { res, json } : json;
   }
 
-  /** Creator info — privacy options, max duration, @ */
+  /** Creator info — privacy options, max duration, @ (read-only) */
   async function queryCreatorInfo() {
     return request("/v2/post/publish/creator_info/query/", { method: "POST", body: {} });
+  }
+
+  /**
+   * Display API — le perfil real (read-only).
+   * TikTok NAO expoe endpoint publico para ALTERAR @, nome, bio ou foto.
+   * Scopes: user.info.basic (+ user.info.profile se aprovado)
+   */
+  async function getUserInfo(fields) {
+    const f = (fields || [
+      "open_id",
+      "union_id",
+      "avatar_url",
+      "display_name",
+      "username",
+      "bio_description",
+      "profile_deep_link",
+      "is_verified",
+    ]).join(",");
+    const base = apiBase();
+    const url = base + "/v2/user/info/?fields=" + encodeURIComponent(f);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: bearer() },
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || (json?.error && json.error.code && json.error.code !== "ok")) {
+      throw new Error(
+        json?.error?.message || json?.error?.code || "Falha ao ler user.info (perfil e so leitura)"
+      );
+    }
+    return json;
   }
 
   /**
@@ -322,6 +353,7 @@ window.TikTokAPI = (function () {
     saveCfg,
     cfg,
     queryCreatorInfo,
+    getUserInfo,
     initVideoPublish,
     uploadVideoFile,
     fetchPublishStatus,
