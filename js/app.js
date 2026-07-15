@@ -2,8 +2,40 @@
 (function () {
   "use strict";
 
+  // GitHub Pages base path fix (critical for /videoflow-pro/)
+  (function fixBase() {
+    try {
+      const p = location.pathname || "/";
+      let base = "/";
+      if (p.includes("/videoflow-pro")) base = "/videoflow-pro/";
+      else if (p.endsWith(".html")) base = p.replace(/[^/]+$/, "");
+      else if (p.endsWith("/")) base = p;
+      else base = p + "/";
+      window.APP_BASE = base;
+      const existing = document.querySelector("base");
+      if (!existing) {
+        const b = document.createElement("base");
+        b.href = base;
+        document.head.insertBefore(b, document.head.firstChild);
+      } else {
+        existing.href = base;
+      }
+      // force trailing slash for project pages root
+      if (p.endsWith("/videoflow-pro")) {
+        history.replaceState(null, "", p + "/" + location.search + location.hash);
+      }
+    } catch (_) {}
+  })();
+
+  function asset(path) {
+    if (!path) return path;
+    if (/^https?:\/\//i.test(path) || path.startsWith("blob:") || path.startsWith("data:")) return path;
+    const base = window.APP_BASE || "./";
+    return base + String(path).replace(/^\//, "");
+  }
+
   const LIB = window.LIBRARY || { videos: [], coverPool: [], postsPerDay: 3 };
-  const STORAGE_KEY = "vf_pro_cloud_v1";
+  const STORAGE_KEY = "vf_pro_cloud_v2";
   const fileBlobs = new Map(); // id -> objectURL
 
   const VIRAL_HOOKS = [
@@ -129,12 +161,17 @@
   }
 
   function coverSrc(v) {
-    return v.cover || "covers/car-01-mansao.jpg";
+    return asset(v.cover || "covers/car-01-mansao.jpg");
   }
 
   function mediaSrc(v) {
     if (fileBlobs.has(v.id)) return fileBlobs.get(v.id);
+    if (v.demoUrl) return v.demoUrl;
     return coverSrc(v);
+  }
+
+  function hasPlayable(v) {
+    return fileBlobs.has(v.id) || !!v.demoUrl;
   }
 
   function genViral(v) {
@@ -419,13 +456,26 @@ ${tags.join(" ")}`;
   }
 
   function enterApp() {
-    $("#landing").classList.add("hidden");
-    $("#shell").classList.add("on");
-    renderAll();
-    loadStudio();
-    botSay(
-      `Online com <strong>${videos.length} vídeos</strong> · 12 capas luxury 9:16 · TikTok + Instagram · 3 posts/dia · anti re-post.`
-    );
+    try {
+      const landing = $("#landing");
+      const shell = $("#shell");
+      if (landing) landing.classList.add("hidden");
+      if (shell) {
+        shell.classList.add("on");
+        shell.style.display = "grid";
+      }
+      document.body.style.overflow = "hidden";
+      renderAll();
+      try { loadStudio(); } catch (e) { console.warn(e); }
+      setView("dashboard");
+      botSay(
+        `Tudo operacional · <strong>${videos.length} vídeos</strong> com demo online · capas 9:16 · Editor Pro · IA · agenda 3/dia.`
+      );
+      toast("Painel aberto — use Importar ou assista os demos");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao abrir painel: " + err.message);
+    }
   }
 
   /* render */
@@ -577,7 +627,7 @@ ${tags.join(" ")}`;
       .map(
         (c) => `
       <div class="cover-item">
-        <img src="covers/${c.file}" alt="${esc(c.title)}" />
+        <img src="${asset("covers/" + c.file)}" alt="${esc(c.title)}" />
         <div class="ci"><strong>${esc(c.title)}</strong>${esc(c.place)} · 9:16</div>
       </div>`
       )
@@ -611,9 +661,9 @@ ${tags.join(" ")}`;
     const ttUser = state.accounts.tiktok.user || "@luxury.garage";
     const igUser = state.accounts.instagram.user || "@luxury.garage";
     const src = mediaSrc(v);
-    const isVid = fileBlobs.has(v.id);
+    const isVid = hasPlayable(v);
     const media = isVid
-      ? `<video src="${src}" muted autoplay loop playsinline></video>`
+      ? `<video src="${src}" muted autoplay loop playsinline controls style="width:100%;height:100%;object-fit:cover"></video>`
       : `<img src="${coverSrc(v)}" alt="" />`;
     $("#phones").innerHTML = `
       <div class="phone">
@@ -638,7 +688,7 @@ ${tags.join(" ")}`;
       <div class="phone ig">
         <div class="phone-notch"></div>
         <div class="phone-screen">
-          ${isVid ? `<video src="${src}" muted autoplay loop playsinline></video>` : `<img src="${coverSrc(v)}" alt="" />`}
+          ${isVid ? `<video src="${src}" muted autoplay loop playsinline controls style="width:100%;height:100%;object-fit:cover"></video>` : `<img src="${coverSrc(v)}" alt="" />`}
           <div class="tt-ui">
             <div class="tt-right">
               <div><div class="tt-ico">♡</div>${fmt(v.likesInstagram || 9200)}</div>
@@ -973,19 +1023,29 @@ ${tags.join(" ")}`;
       save();
     });
 
+    // Studio panel fields (ids: stTitle/stStatus/stDesc — not editor ed*)
+    const stTitle = $("#stTitle") || $("#studioTitle");
+    const stStatus = $("#stStatus") || $("#studioStatus");
+    const stDesc = $("#stDesc") || $("#studioDesc");
     $("#btnSave")?.addEventListener("click", () => {
       const v = selected();
-      v.title = $("#edTitle").value.trim() || v.title;
-      v.status = $("#edStatus").value;
-      v.description = $("#edDesc").textContent;
+      if (!v) return;
+      const titleEl = stTitle || $("#edTitle");
+      const statusEl = stStatus || $("#edStatus");
+      const descEl = stDesc || $("#edDesc");
+      if (titleEl) v.title = (titleEl.value || titleEl.textContent || "").trim() || v.title;
+      if (statusEl) v.status = statusEl.value || v.status;
+      if (descEl) v.description = descEl.value != null ? descEl.value : descEl.textContent;
       toast("Salvo");
       renderAll();
-      paintStudio();
+      try { paintStudio(); } catch (_) {}
     });
     $("#btnViral")?.addEventListener("click", () => {
       const v = selected();
       v.description = genViral(v);
-      paintStudio();
+      if (stDesc) stDesc.textContent = v.description;
+      if ($("#edDesc")) $("#edDesc").textContent = v.description;
+      try { paintStudio(); } catch (_) {}
       save();
       toast("Legenda viral");
       botSay("Legenda chamativa aplicada.");
@@ -1000,7 +1060,7 @@ ${tags.join(" ")}`;
     $("#btnQIG")?.addEventListener("click", () => enqueueOne("instagram"));
 
     $("#chatSend")?.addEventListener("click", () => {
-      const t = $("#chatInput").value.trim();
+      const t = ($("#chatInput")?.value || "").trim();
       if (!t) return;
       userSay(t);
       $("#chatInput").value = "";
@@ -1009,13 +1069,13 @@ ${tags.join(" ")}`;
     $("#chatInput")?.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        $("#chatSend").click();
+        $("#chatSend")?.click();
       }
     });
     $$("#sugs .sug").forEach((s) =>
       s.addEventListener("click", () => {
-        $("#chatInput").value = s.textContent;
-        $("#chatSend").click();
+        if ($("#chatInput")) $("#chatInput").value = s.textContent;
+        $("#chatSend")?.click();
       })
     );
 
@@ -1067,45 +1127,73 @@ ${tags.join(" ")}`;
   }
 
   // boot
-  load();
-  videos.forEach((v) => {
-    v.format = "9:16";
-    v.type = "short";
-    if (!v.description) v.description = genViral(v);
-  });
-  bindUI();
-  // hero carousel
-  const heroImg = $("#heroImg");
-  if (heroImg && LIB.coverPool?.length) {
-    let i = 0;
-    setInterval(() => {
-      i = (i + 1) % LIB.coverPool.length;
-      heroImg.src = "covers/" + LIB.coverPool[i].file;
-    }, 3200);
-  }
+  try {
+    load();
+    // re-apply demo urls from library after load merge
+    const demoMap = Object.fromEntries((LIB.videos || []).map((v) => [v.id, v.demoUrl]));
+    videos.forEach((v) => {
+      v.format = "9:16";
+      v.type = "short";
+      if (demoMap[v.id]) v.demoUrl = demoMap[v.id];
+      if (!v.description) v.description = genViral(v);
+    });
+    if (!videos.length) {
+      console.warn("No videos in library");
+    }
+    bindUI();
+    // hero carousel
+    const heroImg = $("#heroImg");
+    if (heroImg && LIB.coverPool?.length) {
+      let i = 0;
+      setInterval(() => {
+        i = (i + 1) % LIB.coverPool.length;
+        heroImg.src = asset("covers/" + LIB.coverPool[i].file);
+      }, 3200);
+    }
 
-  // public API for editor / AI bridge
-  window.VideoFlowApp = {
-    getVideos: () => videos,
-    getSelected: () => selected(),
-    setSelected: (id) => {
-      state.selectedId = id;
-      renderAll();
-    },
-    getBlobUrl: (id) => fileBlobs.get(id) || null,
-    getFileBlobs: () => fileBlobs,
-    save,
-    renderAll,
-    setView,
-    genViral,
-    updateVideo(id, partial) {
-      const v = videos.find((x) => x.id === id);
-      if (!v) return;
-      Object.assign(v, partial);
-      save();
-      renderAll();
-    },
-    getState: () => state,
-  };
-  window.__VF_VIDEO_IDS__ = () => videos.map((v) => v.id);
+    // public API for editor / AI bridge
+    window.VideoFlowApp = {
+      getVideos: () => videos,
+      getSelected: () => selected(),
+      setSelected: (id) => {
+        state.selectedId = Number(id);
+        renderAll();
+      },
+      getBlobUrl: (id) => {
+        if (fileBlobs.has(id)) return fileBlobs.get(id);
+        const v = videos.find((x) => x.id === id);
+        return v?.demoUrl || null;
+      },
+      getFileBlobs: () => fileBlobs,
+      save,
+      renderAll,
+      setView,
+      genViral,
+      asset,
+      enterApp,
+      updateVideo(id, partial) {
+        const v = videos.find((x) => x.id === id);
+        if (!v) return;
+        Object.assign(v, partial);
+        save();
+        renderAll();
+      },
+      getState: () => state,
+      getDemoMusic: () => LIB.demoMusic || [],
+    };
+    window.__VF_VIDEO_IDS__ = () => videos.map((v) => v.id);
+    window.VideoFlowReady = true;
+    document.dispatchEvent(new CustomEvent("vf-ready"));
+    console.info("VideoFlow Pro ready", videos.length, "videos");
+  } catch (err) {
+    console.error("VideoFlow boot failed", err);
+    const banner = document.createElement("div");
+    banner.style.cssText =
+      "position:fixed;inset:0;z-index:9999;background:#111;color:#fff;padding:24px;font:16px/1.5 system-ui";
+    banner.innerHTML =
+      "<h2>Erro ao carregar VideoFlow</h2><pre style='white-space:pre-wrap'>" +
+      String(err && err.stack ? err.stack : err) +
+      "</pre><p>Recarregue com Ctrl+F5. Se persistir, abra o console (F12).</p>";
+    document.body.appendChild(banner);
+  }
 })();

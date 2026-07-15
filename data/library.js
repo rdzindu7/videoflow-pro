@@ -103,7 +103,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                    },
                    {
                        "id":  2,
@@ -139,7 +140,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
                    },
                    {
                        "id":  3,
@@ -175,7 +177,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
                    },
                    {
                        "id":  4,
@@ -211,7 +214,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
                    },
                    {
                        "id":  5,
@@ -247,7 +251,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
                    },
                    {
                        "id":  6,
@@ -283,7 +288,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                    },
                    {
                        "id":  7,
@@ -319,7 +325,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
                    },
                    {
                        "id":  8,
@@ -355,7 +362,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
                    },
                    {
                        "id":  9,
@@ -391,7 +399,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
                    },
                    {
                        "id":  10,
@@ -427,7 +436,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                    },
                    {
                        "id":  11,
@@ -463,7 +473,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"
                    },
                    {
                        "id":  12,
@@ -499,7 +510,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
                    },
                    {
                        "id":  13,
@@ -535,7 +547,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                    },
                    {
                        "id":  14,
@@ -571,7 +584,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
                    },
                    {
                        "id":  15,
@@ -607,7 +621,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
                    },
                    {
                        "id":  16,
@@ -643,7 +658,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
                    },
                    {
                        "id":  17,
@@ -679,7 +695,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
                    },
                    {
                        "id":  18,
@@ -715,7 +732,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                    },
                    {
                        "id":  19,
@@ -751,7 +769,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
                    },
                    {
                        "id":  20,
@@ -787,7 +806,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
                    },
                    {
                        "id":  21,
@@ -823,7 +843,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
                    },
                    {
                        "id":  22,
@@ -859,7 +880,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                    },
                    {
                        "id":  23,
@@ -895,7 +917,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"
                    },
                    {
                        "id":  24,
@@ -931,7 +954,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
                    },
                    {
                        "id":  25,
@@ -967,7 +991,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                    },
                    {
                        "id":  26,
@@ -1003,7 +1028,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
                    },
                    {
                        "id":  27,
@@ -1039,7 +1065,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
                    },
                    {
                        "id":  28,
@@ -1075,7 +1102,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
                    },
                    {
                        "id":  29,
@@ -1111,7 +1139,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
                    },
                    {
                        "id":  30,
@@ -1147,7 +1176,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                    },
                    {
                        "id":  31,
@@ -1183,7 +1213,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
                    },
                    {
                        "id":  32,
@@ -1219,7 +1250,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
                    },
                    {
                        "id":  33,
@@ -1255,7 +1287,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
                    },
                    {
                        "id":  34,
@@ -1291,7 +1324,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                    },
                    {
                        "id":  35,
@@ -1327,7 +1361,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"
                    },
                    {
                        "id":  36,
@@ -1363,7 +1398,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
                    },
                    {
                        "id":  37,
@@ -1399,7 +1435,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                    },
                    {
                        "id":  38,
@@ -1435,7 +1472,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
                    },
                    {
                        "id":  39,
@@ -1471,7 +1509,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
                    },
                    {
                        "id":  40,
@@ -1507,7 +1546,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
                    },
                    {
                        "id":  41,
@@ -1543,7 +1583,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
                    },
                    {
                        "id":  42,
@@ -1579,7 +1620,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                    },
                    {
                        "id":  43,
@@ -1615,7 +1657,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
                    },
                    {
                        "id":  44,
@@ -1651,7 +1694,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
                    },
                    {
                        "id":  45,
@@ -1687,7 +1731,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
                    },
                    {
                        "id":  46,
@@ -1723,7 +1768,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                    },
                    {
                        "id":  47,
@@ -1759,7 +1805,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"
                    },
                    {
                        "id":  48,
@@ -1795,7 +1842,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
                    },
                    {
                        "id":  49,
@@ -1831,7 +1879,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                    },
                    {
                        "id":  50,
@@ -1867,7 +1916,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
                    },
                    {
                        "id":  51,
@@ -1903,7 +1953,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
                    },
                    {
                        "id":  52,
@@ -1939,7 +1990,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
                    },
                    {
                        "id":  53,
@@ -1975,7 +2027,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
                    },
                    {
                        "id":  54,
@@ -2011,7 +2064,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                    },
                    {
                        "id":  55,
@@ -2047,7 +2101,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
                    },
                    {
                        "id":  56,
@@ -2083,7 +2138,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
                    },
                    {
                        "id":  57,
@@ -2119,7 +2175,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
                    },
                    {
                        "id":  58,
@@ -2155,7 +2212,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                    },
                    {
                        "id":  59,
@@ -2191,7 +2249,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"
                    },
                    {
                        "id":  60,
@@ -2227,7 +2286,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
                    },
                    {
                        "id":  61,
@@ -2263,7 +2323,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
                    },
                    {
                        "id":  62,
@@ -2299,7 +2360,8 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
                    },
                    {
                        "id":  63,
@@ -2335,7 +2397,22 @@ window.LIBRARY = {
                        "markups":  [
 
                                    ],
-                       "hasLocalFile":  false
+                       "hasLocalFile":  false,
+                       "demoUrl":  "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
                    }
-               ]
+               ],
+    "demoMusic":  [
+                      {
+                          "name":  "Cinematic Pulse",
+                          "url":  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                      },
+                      {
+                          "name":  "Drive Night",
+                          "url":  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+                      },
+                      {
+                          "name":  "Luxury Ambient",
+                          "url":  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+                      }
+                  ]
 };

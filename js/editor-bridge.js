@@ -54,13 +54,42 @@
     const v = A.getSelected();
     if (!v) return;
     window.__VF_VIDEO_IDS__ = A.getVideos().map((x) => x.id);
-    const blob = A.getBlobUrl(v.id);
+    const blob = A.getBlobUrl(v.id); // includes demoUrl
     E.loadVideo(v, blob);
-    $("#aiDescActive") && ($("#aiDescActive").textContent = v.description || "");
-    if (!blob) {
-      $("#edMeta") &&
-        ($("#edMeta").innerHTML +=
-          `<br><span style="color:var(--warn)">⚠ Importe o MP4 em Importar para assistir e editar o vídeo real.</span>`);
+    if ($("#aiDescActive")) $("#aiDescActive").textContent = v.description || "";
+    const meta = $("#edMeta");
+    if (meta) {
+      const play = blob
+        ? `<span style="color:var(--ok)">▶ Vídeo pronto para play</span>`
+        : `<span style="color:var(--warn)">⚠ Sem arquivo — use Importar ou aguarde demo</span>`;
+      meta.innerHTML = `<strong>${esc(v.title)}</strong><br>${esc(v.file || "")}<br>${play}`;
+    }
+    // demo music buttons
+    const musicBox = $("#edDemoMusic");
+    if (musicBox && !musicBox._ready) {
+      musicBox._ready = true;
+      const list = A.getDemoMusic?.() || [];
+      musicBox.innerHTML = list
+        .map(
+          (m, i) =>
+            `<button type="button" class="btn ghost sm demo-music" data-i="${i}">♪ ${esc(m.name)}</button>`
+        )
+        .join(" ");
+      musicBox.querySelectorAll(".demo-music").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const m = list[Number(btn.dataset.i)];
+          if (!m) return;
+          E.patch(v.id, { musicUrl: m.url, musicName: m.name, musicVolume: 0.32 });
+          const audio = document.querySelector("#edMusic");
+          if (audio) {
+            audio.src = m.url;
+            audio.loop = true;
+            audio.volume = 0.32;
+          }
+          if ($("#edMusicName")) $("#edMusicName").textContent = m.name;
+          toast("Trilha: " + m.name);
+        });
+      });
     }
   }
 
@@ -155,7 +184,7 @@
     const E = ed();
     const A = app();
     if (!E || !A) {
-      setTimeout(wire, 50);
+      setTimeout(wire, 80);
       return;
     }
 

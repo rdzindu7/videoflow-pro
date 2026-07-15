@@ -70,20 +70,25 @@ window.VideoFlowEditor = (function () {
     const { video: v, music, cover, overlay } = els();
     if (!v) return;
 
+    const coverPath = (window.VideoFlowApp && window.VideoFlowApp.asset)
+      ? window.VideoFlowApp.asset(video.cover || "covers/car-01-mansao.jpg")
+      : (video.cover || "covers/car-01-mansao.jpg");
     if (blobUrl) {
       v.style.display = "block";
+      v.controls = true;
       if (cover) cover.style.display = "none";
-      if (v.src !== blobUrl) {
+      if (v.getAttribute("src") !== blobUrl) {
         v.src = blobUrl;
         v.load();
       }
     } else {
       v.pause();
       v.removeAttribute("src");
+      v.load?.();
       v.style.display = "none";
       if (cover) {
         cover.style.display = "block";
-        cover.src = video.cover || "covers/car-01-mansao.jpg";
+        cover.src = coverPath;
       }
     }
 

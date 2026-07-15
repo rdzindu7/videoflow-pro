@@ -1,11 +1,28 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="VideoFlow Pro â€” organizaÃ§Ã£o 9:16, capas luxury cars, legendas virais, agenda 3 posts/dia TikTok + Instagram" />
+  <meta name="description" content="VideoFlow Pro - organizacao 9:16, capas luxury cars, legendas virais, agenda 3 posts/dia TikTok + Instagram" />
   <meta name="theme-color" content="#05060a" />
-  <title>VideoFlow Pro Â· TikTok + Instagram Â· Luxury Cars 9:16</title>
+  <title>VideoFlow Pro | TikTok + Instagram | Luxury Cars 9:16</title>
+  <script>
+    (function () {
+      var p = location.pathname || "/";
+      var base = "/";
+      if (p.indexOf("/videoflow-pro") !== -1) base = "/videoflow-pro/";
+      else if (/\.html?$/i.test(p)) base = p.replace(/[^\/]+$/, "");
+      else if (p.slice(-1) === "/") base = p;
+      else base = p + "/";
+      window.APP_BASE = base;
+      document.write('<base href="' + base + '">');
+      if (p === "/videoflow-pro" || p === "/videoflow-pro/") {
+        /* ok */
+      } else if (p === "/videoflow-pro") {
+        location.replace("/videoflow-pro/" + location.search + location.hash);
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/app.css" />
   <link rel="icon" href="covers/car-01-mansao.jpg" />
 </head>
@@ -286,6 +303,7 @@
                   <button class="btn ghost sm" id="edMusicClear">Remover</button>
                   <span id="edMusicName" style="font-size:.78rem;color:var(--muted)">Nenhuma trilha</span>
                 </div>
+                <div id="edDemoMusic" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
                 <div class="ed-section-title">Velocidade & look</div>
                 <div class="slider-row"><span>Speed</span><input type="range" id="edSpeed" min="0.25" max="2" step="0.05" value="1" /><span id="edSpeedVal">1.00x</span></div>
                 <div class="slider-row"><span>Bright</span><input type="range" id="edBright" min="0.5" max="1.5" step="0.01" value="1" /><span></span></div>
