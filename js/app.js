@@ -248,13 +248,21 @@
   }
 
   function genViral(v) {
+    // prioridade: legenda personalizada pelo nicho da conta
+    if (window.LuxeProfile?.loadProfile()?.niche) {
+      try {
+        return window.LuxeProfile.nicheCaption(v);
+      } catch (_) {}
+    }
     if (window.VideoFlowAI?.bestDescription) {
       try {
+        const style = window.LuxeProfile?.loadProfile()?.captionStyle || "viral";
+        if (window.VideoFlowAI.generateDescription) {
+          const t = window.VideoFlowAI.generateDescription(v, style).text;
+          if (t && !isOldLongCaption(t)) return t;
+        }
         const t = window.VideoFlowAI.bestDescription(v).text;
         if (t && !isOldLongCaption(t)) return t;
-        if (window.VideoFlowAI.generateDescription) {
-          return window.VideoFlowAI.generateDescription(v, "viral").text;
-        }
       } catch (_) {}
     }
     const hook = VIRAL_HOOKS[v.id % VIRAL_HOOKS.length];
@@ -266,8 +274,55 @@
     ];
     const cta = ctas[v.id % ctas.length];
     const tags = pickTags(v);
-    // curta: hook + CTA + max 5 #  — SEM detalhes do video
     return `${hook}\n${cta}\n\n${tags.join(" ")}`;
+  }
+
+  function refreshAccountUI() {
+    const P = window.LuxeProfile;
+    if (!P) return;
+    const isNew = P.isNewAccount();
+    const prof = P.loadProfile();
+    const badge = $("#accountBadge");
+    const banner = $("#newAccountBanner");
+    const nicheLbl = $("#nicheLabel");
+    if (badge) {
+      badge.textContent = isNew ? "Conta nova" : prof?.nicheLabel || "Conta ativa";
+      badge.classList.toggle("new", isNew);
+    }
+    if (banner) banner.style.display = isNew ? "block" : "none";
+    if (nicheLbl) {
+      nicheLbl.textContent = prof?.niche
+        ? `Nicho: ${prof.nicheLabel} · mix ${prof.autoMixStyle}`
+        : "Nicho ainda nao definido";
+    }
+    const sum = P.summary();
+    const el = $("#profileSummary");
+    if (el) el.textContent = typeof sum === "string" ? sum : sum.text;
+  }
+
+  function runNichePersonalization(forceDetect) {
+    const P = window.LuxeProfile;
+    if (!P) return;
+    let nicheId = P.loadProfile()?.niche;
+    let det = null;
+    if (forceDetect || !nicheId) {
+      det = P.detectNicheFromVideos(videos);
+      nicheId = det.nicheId;
+    }
+    const { profile, niche } = P.applyNiche(nicheId, { detection: det });
+    const r = P.personalizeLibrary(videos, profile);
+    // default auto mix style
+    const sel = $("#autoMixStyle");
+    if (sel && niche.autoMixStyle) sel.value = niche.autoMixStyle;
+    save();
+    renderAll();
+    refreshAccountUI();
+    toast(`Conta personalizada: ${niche.label}`);
+    botSay(
+      `Detectei/apliquei o nicho <strong>${esc(niche.label)}</strong> (${esc(profile.reason || "")}).` +
+        ` Legendаs, musica e Auto Mix ajustados. ${r.changed} item(ns) atualizados.`
+    );
+    return profile;
   }
 
   function pickTags(v) {
@@ -520,9 +575,19 @@
       }
     });
     save();
-    toast(`${files.length} vídeo(s) importado(s)`);
+    toast(`${files.length} video(s) importado(s)`);
+    // se conta nova ou sem nicho, detectar e personalizar
+    if (window.LuxeProfile) {
+      const prof = window.LuxeProfile.loadProfile();
+      if (!prof?.niche || window.LuxeProfile.isNewAccount() || files.length >= 2) {
+        runNichePersonalization(true);
+      }
+    }
     renderAll();
-    botSay(`Importei <strong>${files.length}</strong> vídeo(s). Capas 9:16 e legendas virais já aplicadas.`);
+    refreshAccountUI();
+    botSay(
+      `Importei <strong>${files.length}</strong> video(s). Capas ficam separadas. Nicho analisado para personalizar legendas e Auto Mix.`
+    );
   }
 
   /* nav */
@@ -552,10 +617,14 @@
       renderAll();
       try { loadStudio(); } catch (e) { console.warn(e); }
       setView("dashboard");
+      refreshAccountUI();
+      const isNew = window.LuxeProfile?.isNewAccount?.();
       botSay(
-        `<strong>LUXECUT</strong> pronto. Biblioteca <strong>vazia</strong> — importe seus videos. Capas ficam separadas. Use <strong>Auto Mix IA</strong> para juntar clips + musica + edit automatico.`
+        isNew
+          ? `<strong>Conta nova detectada.</strong> Importe videos ou escolha seu nicho — o LUXECUT personaliza legendas, musica e Auto Mix.`
+          : `<strong>LUXECUT</strong> pronto. Use Importar, Capas e Auto Mix IA.`
       );
-      toast("LUXECUT — adicione seus videos em Importar");
+      toast(isNew ? "Conta nova — personalize seu nicho" : "LUXECUT — studio aberto");
     } catch (err) {
       console.error(err);
       alert("Erro ao abrir painel: " + err.message);
@@ -1230,6 +1299,34 @@
         toast("Pack manual criado");
       }
     });
+
+    // Onboarding / nicho
+    $("#btnDetectNiche")?.addEventListener("click", () => runNichePersonalization(true));
+    $("#btnSaveNiche")?.addEventListener("click", () => {
+      const id = $("#nicheSelect")?.value;
+      if (!id || !window.LuxeProfile) return;
+      window.LuxeProfile.applyNiche(id, { detection: { reason: "escolhido manualmente", confidence: 1 } });
+      window.LuxeProfile.personalizeLibrary(videos, window.LuxeProfile.loadProfile());
+      save();
+      renderAll();
+      refreshAccountUI();
+      toast("Nicho salvo");
+      $("#newAccountBanner") && ($("#newAccountBanner").style.display = "none");
+    });
+    $("#btnSkipOnboard")?.addEventListener("click", () => {
+      window.LuxeProfile?.markOnboardingDone({ niche: "luxury_cars", nicheLabel: "Carros de luxo" });
+      refreshAccountUI();
+      $("#newAccountBanner") && ($("#newAccountBanner").style.display = "none");
+    });
+    // popular select de nichos
+    if ($("#nicheSelect") && window.LuxeProfile) {
+      const sel = $("#nicheSelect");
+      sel.innerHTML = Object.values(window.LuxeProfile.NICHES)
+        .map((n) => `<option value="${n.id}">${n.label}</option>`)
+        .join("");
+      const cur = window.LuxeProfile.loadProfile()?.niche;
+      if (cur) sel.value = cur;
+    }
     $("#btnReassignCovers")?.addEventListener("click", reassignCovers);
     $("#btnReassignCovers2")?.addEventListener("click", reassignCovers);
     $("#btnSimGrowth")?.addEventListener("click", () => {
@@ -1489,6 +1586,17 @@
     window.VideoFlowReady = true;
     document.dispatchEvent(new CustomEvent("vf-ready"));
     console.info("LUXECUT ready", videos.length, "videos");
+    // conta nova / personalizacao
+    setTimeout(() => {
+      refreshAccountUI();
+      if (window.LuxeProfile?.isNewAccount()) {
+        if (videos.length) runNichePersonalization(true);
+        else {
+          const banner = document.getElementById("newAccountBanner");
+          if (banner) banner.style.display = "block";
+        }
+      }
+    }, 200);
   } catch (err) {
     console.error("VideoFlow boot failed", err);
     const banner = document.createElement("div");

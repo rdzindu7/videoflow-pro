@@ -160,9 +160,38 @@
               <button class="btn sm" type="button" data-view="import">Adicionar MP4</button>
             </div>
           </div>
+          <div id="newAccountBanner" class="panel" style="display:none;margin-bottom:14px;border-color:rgba(201,162,39,.4)">
+            <div class="panel-b">
+              <h3 style="margin:0 0 6px">Conta nova · personalize seu nicho</h3>
+              <p style="margin:0 0 10px;color:var(--muted);font-size:.88rem;line-height:1.45">
+                O LUXECUT verifica se a conta e nova e adapta legendas, musicas e Auto Mix ao tipo de video que voce posta.
+              </p>
+              <div class="ed-grid-2">
+                <div class="field">
+                  <label>Seu nicho</label>
+                  <select id="nicheSelect"></select>
+                </div>
+                <div class="field">
+                  <label>Acoes</label>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn sm" type="button" id="btnDetectNiche">Detectar pelos videos</button>
+                    <button class="btn sm" type="button" id="btnSaveNiche">Salvar nicho</button>
+                    <button class="btn ghost sm" type="button" id="btnSkipOnboard">Depois</button>
+                  </div>
+                </div>
+              </div>
+              <div id="profileSummary" class="note" style="margin-top:10px">Aguardando personalizacao…</div>
+            </div>
+          </div>
           <div id="emptyLibHint" class="note" style="margin-bottom:14px">
-            Nenhum video na biblioteca. Va em <strong>Adicionar videos</strong>, depois use <strong>Auto Mix IA</strong>
-            para juntar clips + musica + edit automatico. Capas ficam na aba Capas (separadas).
+            Nenhum video na biblioteca. Va em <strong>Adicionar videos</strong>, depois use <strong>Auto Mix IA</strong>.
+            Capas ficam na aba Capas (separadas).
+          </div>
+          <div class="pill" style="margin-bottom:12px;display:inline-flex;gap:10px">
+            <span class="dot" id="accountDot"></span>
+            <span id="accountBadge">Conta</span>
+            <span style="opacity:.5">|</span>
+            <span id="nicheLabel">Nicho…</span>
           </div>
           <div class="kpis">
             <div class="kpi"><div class="l">Seus videos</div><div class="v" id="kTotal">0</div><div class="s">na biblioteca</div></div>
@@ -670,15 +699,16 @@ POST /v2/post/publish/creator_info/query/</div>
   <div class="toast" id="toast"></div>
 
   <script src="data/library.js?v=clear1"></script>
-  <script src="js/brand.js?v=novid1"></script>
+  <script src="js/account-profile.js?v=niche1"></script>
+  <script src="js/brand.js?v=niche1"></script>
   <script src="js/music-library.js?v=clear1"></script>
-  <script src="js/ai-engine.js?v=novid1"></script>
-  <script src="js/auto-combine.js?v=novid1"></script>
-  <script src="js/editor.js?v=novid1"></script>
-  <script src="js/tiktok-api.js?v=novid1"></script>
-  <script src="js/app.js?v=clear2"></script>
-  <script src="js/editor-bridge.js?v=novid1"></script>
-  <script src="js/tiktok-bridge.js?v=auto1"></script>
+  <script src="js/ai-engine.js?v=niche1"></script>
+  <script src="js/auto-combine.js?v=niche1"></script>
+  <script src="js/editor.js?v=niche1"></script>
+  <script src="js/tiktok-api.js?v=niche1"></script>
+  <script src="js/app.js?v=niche1"></script>
+  <script src="js/editor-bridge.js?v=niche1"></script>
+  <script src="js/tiktok-bridge.js?v=niche1"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", function () {
       document.getElementById("btnEnter")?.click();
