@@ -35,7 +35,7 @@
   }
 
   const LIB = window.LIBRARY || { videos: [], coverPool: [], postsPerDay: 3 };
-  const STORAGE_KEY = "luxecut_v2_novideos";
+  const STORAGE_KEY = "luxecut_v3_cleared";
   const fileBlobs = new Map(); // id -> objectURL
   let projects = [];
   let selectedProjectId = null;
@@ -102,28 +102,39 @@
 
   function load() {
     try {
+      // limpar storages antigos (videos que o usuario tinha adicionado)
+      try {
+        [
+          "vf_pro_cloud_v1",
+          "vf_pro_cloud_v2",
+          "vf_pro_cloud_v3_shortcap",
+          "luxecut_v1_empty",
+          "luxecut_v2_novideos",
+        ].forEach((k) => localStorage.removeItem(k));
+      } catch (_) {}
+
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
         videos = [];
         projects = [];
+        state.selectedId = null;
+        state.queue = [];
         return;
       }
       const d = JSON.parse(raw);
-      // apenas videos que o usuario adicionou (sem catalogo embutido)
-      if (Array.isArray(d.videos)) {
-        videos = d.videos.map((s) =>
-          normalizeVideo({ ...s, hasLocalFile: false, demoUrl: s.demoUrl || "" })
-        );
-      } else {
-        videos = [];
-      }
-      if (Array.isArray(d.projects)) projects = d.projects;
-      if (d.queue) state.queue = d.queue;
+      // RESET: nao carregar videos antigos — biblioteca limpa
+      videos = [];
+      projects = [];
+      state.selectedId = null;
+      state.queue = [];
+      // manter so contas/API se existirem
       if (d.accounts) state.accounts = d.accounts;
-      if (videos.length) state.selectedId = videos[0].id;
+      // gravar estado limpo
+      save();
     } catch (_) {
       videos = [];
       projects = [];
+      state.selectedId = null;
     }
   }
 
