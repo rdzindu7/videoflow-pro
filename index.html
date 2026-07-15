@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="VideoFlow Pro — organização 9:16, capas luxury cars, legendas virais, agenda 3 posts/dia TikTok + Instagram" />
+  <meta name="theme-color" content="#05060a" />
+  <title>VideoFlow Pro · TikTok + Instagram · Luxury Cars 9:16</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <link rel="icon" href="covers/car-01-mansao.jpg" />
+</head>
+<body>
+  <!-- LANDING -->
+  <div class="landing" id="landing">
+    <nav class="landing-nav">
+      <div class="brand">
+        <div class="logo">VF</div>
+        <div>
+          <h1>VideoFlow Pro</h1>
+          <small>GitHub · Online · 9:16</small>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <a class="btn ghost sm" href="https://github.com" id="repoLink" target="_blank" rel="noopener">GitHub</a>
+        <button class="btn sm" id="btnEnter">Abrir painel →</button>
+      </div>
+    </nav>
+
+    <section class="landing-hero">
+      <div>
+        <h1>Postagens automáticas com capas de <span>carros de luxo</span> em 9:16</h1>
+        <p>
+          Organize vídeos, gere capas premium, legendas virais e hashtags,
+          agende <strong>3 posts por dia</strong> no TikTok e Instagram,
+          evite re-posts, aplique boost de views e veja o preview real das telas.
+        </p>
+        <div class="hero-actions">
+          <button class="btn" id="btnEnter2">Começar agora</button>
+          <button class="btn ghost" data-view-later="import">Importar meus vídeos</button>
+        </div>
+        <p style="margin-top:16px;font-size:.82rem;color:var(--muted)">
+          63 vídeos catalogados · 12 capas 9:16 · anti-duplicata · chat IA de edição
+        </p>
+      </div>
+      <div class="hero-card">
+        <img id="heroImg" src="covers/car-01-mansao.jpg" alt="Capa luxury car" />
+        <div class="overlay">
+          <div style="font-weight:700;font-size:.95rem">Luxury Cars · 9:16</div>
+          <div style="font-size:.8rem;opacity:.85;margin-top:4px">Mansões · Riviera · Jet · Penthouse</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature">
+        <h3>♪ TikTok + 📷 Instagram</h3>
+        <p>Conecte contas, autorize permissões e enfileire postagens nas duas redes.</p>
+      </div>
+      <div class="feature">
+        <h3>3 posts por dia</h3>
+        <p>Agenda automática 11:00 · 15:30 · 20:00. Nunca reposta o que já saiu.</p>
+      </div>
+      <div class="feature">
+        <h3>Capas automáticas 9:16</h3>
+        <p>Pack de carros em lugares ultra-ricos, sem repetir em sequência.</p>
+      </div>
+      <div class="feature">
+        <h3>Legendas virais + #</h3>
+        <p>Textos chamativos e hashtags top para maximizar alcance.</p>
+      </div>
+      <div class="feature">
+        <h3>Preview real</h3>
+        <p>Veja como fica na tela do TikTok e do Instagram Reels com views.</p>
+      </div>
+      <div class="feature">
+        <h3>Estúdio + Chat IA</h3>
+        <p>Marcações, texto na capa, boost e comandos em linguagem natural.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- APP SHELL -->
+  <div class="shell" id="shell">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">VF</div>
+        <div>
+          <h1>VideoFlow Pro</h1>
+          <small>9:16 · Luxury · TT+IG</small>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-view="dashboard">Dashboard</button>
+        <button class="tab" data-view="import">Importar</button>
+        <button class="tab" data-view="biblioteca">Biblioteca</button>
+        <button class="tab" data-view="capas">Capas</button>
+        <button class="tab" data-view="preview">Preview</button>
+        <button class="tab" data-view="estudio">Estúdio + IA</button>
+        <button class="tab" data-view="agenda">Agenda 3/dia</button>
+        <button class="tab" data-view="analytics">Views</button>
+        <button class="tab" data-view="contas">Contas</button>
+      </nav>
+      <div class="top-right">
+        <div class="pill"><span class="dot" id="dotTT"></span><span id="lblTT">TikTok off</span></div>
+        <div class="pill"><span class="dot" id="dotIG"></span><span id="lblIG">Instagram off</span></div>
+        <button class="btn sm" id="btnAutoDay">Gerar dia (3)</button>
+      </div>
+    </header>
+
+    <div class="body">
+      <aside class="side">
+        <div class="side-label">Operação</div>
+        <button class="nav active" data-view="dashboard">▣ Dashboard</button>
+        <button class="nav" data-view="import">⬆ Importar vídeos</button>
+        <button class="nav" data-view="biblioteca">▮ Biblioteca <span class="c" id="cLib">0</span></button>
+        <button class="nav" data-view="capas">🖼 Capas 9:16</button>
+        <button class="nav" data-view="preview">📱 Preview real</button>
+        <div class="side-label">Criação</div>
+        <button class="nav" data-view="estudio">✦ Estúdio + IA</button>
+        <div class="side-label">Publicação</div>
+        <button class="nav" data-view="agenda">📅 Agenda <span class="c" id="cQ">0</span></button>
+        <button class="nav" data-view="analytics">📈 Views & Boost</button>
+        <button class="nav" data-view="contas">🔗 Contas TT+IG</button>
+        <div class="side-foot">
+          <strong>Regras ativas</strong>
+          Tudo 9:16 · 3 posts/dia · anti re-post · capas sem repetir · legendas virais · boost
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="view active" id="view-dashboard">
+          <div class="head">
+            <div>
+              <h2>Central de operação</h2>
+              <p>Catálogo online · capas luxury · automação TikTok + Instagram</p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn ghost sm" id="btnRegenAll">Legendas virais</button>
+              <button class="btn ghost sm" id="btnReassignCovers">Capas únicas</button>
+              <button class="btn sm" data-view="import">Importar MP4</button>
+            </div>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><div class="l">Biblioteca</div><div class="v" id="kTotal">0</div><div class="s">vídeos</div></div>
+            <div class="kpi"><div class="l">Livres</div><div class="v" id="kReady">0</div><div class="s">nunca postados</div></div>
+            <div class="kpi"><div class="l">Postados</div><div class="v" id="kPosted">0</div><div class="s">bloqueados</div></div>
+            <div class="kpi"><div class="l">Fila hoje</div><div class="v" id="kToday">0</div><div class="s">meta 3/dia</div></div>
+            <div class="kpi"><div class="l">Views TT</div><div class="v" id="kViewsTT">0</div><div class="s">total</div></div>
+            <div class="kpi"><div class="l">Views IG</div><div class="v" id="kViewsIG">0</div><div class="s">Reels</div></div>
+          </div>
+          <div class="split">
+            <div class="panel">
+              <div class="panel-h"><h3>Próximos do dia</h3></div>
+              <div class="panel-b" id="todayQueue"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h3>Como usar online</h3></div>
+              <div class="panel-b" style="font-size:.86rem;color:var(--muted);line-height:1.55">
+                <ol style="margin:0;padding-left:1.1rem">
+                  <li>Importe seus MP4 (arraste ou botão Importar)</li>
+                  <li>Conecte TikTok e Instagram em Contas</li>
+                  <li>Gere legendas + capas automáticas</li>
+                  <li>Clique em <strong>Gerar dia (3)</strong></li>
+                  <li>Processe a fila e acompanhe views/boost</li>
+                </ol>
+                <div class="note">
+                  Capas e o app rodam 100% no GitHub Pages. Postagem real nas redes exige API (TikTok Developers + Meta).
+                  O site prepara e simula a operação completa até você plugar as chaves.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-import">
+          <div class="head">
+            <div>
+              <h2>Importar vídeos</h2>
+              <p>Arraste MP4/MOV da pasta trabalho · recebe capa 9:16 + legenda viral automático</p>
+            </div>
+          </div>
+          <div class="dropzone" id="dropzone">
+            <h3>⬆ Solte os vídeos aqui</h3>
+            <p>ou clique para escolher arquivos · formato tratado como 9:16</p>
+            <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.webm,.mkv" multiple hidden />
+          </div>
+          <div class="note" style="margin-top:14px">
+            Dica: selecione os arquivos de <code>Documents\trabalho</code>. Eles ficam no seu navegador (não sobem ao GitHub).
+          </div>
+        </section>
+
+        <section class="view" id="view-biblioteca">
+          <div class="head">
+            <div>
+              <h2>Biblioteca 9:16</h2>
+              <p>Todos os vídeos · status · views · boost</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search"><span>⌕</span><input id="search" placeholder="Buscar..." /></div>
+            <button class="chip active" data-f="todos">Todos</button>
+            <button class="chip" data-f="pronto">Prontos</button>
+            <button class="chip" data-f="agendado">Agendados</button>
+            <button class="chip" data-f="publicado">Publicados</button>
+            <button class="chip" data-f="livre">Nunca postados</button>
+          </div>
+          <div class="grid" id="grid"></div>
+        </section>
+
+        <section class="view" id="view-capas">
+          <div class="head">
+            <div>
+              <h2>Capas automáticas 9:16</h2>
+              <p>Luxury cars em lugares ultra-ricos · distribuição sem repetir em sequência</p>
+            </div>
+            <button class="btn sm" id="btnReassignCovers2">Redistribuir</button>
+          </div>
+          <div class="cover-gallery" id="coverGallery"></div>
+          <div class="panel" style="margin-top:14px">
+            <div class="panel-h"><h3>Mapa vídeo → capa</h3></div>
+            <div class="panel-b" id="coverMap" style="max-height:360px;overflow:auto"></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-preview">
+          <div class="head">
+            <div>
+              <h2>Preview real</h2>
+              <p>Como o público vê no TikTok e no Instagram Reels</p>
+            </div>
+            <select id="previewSelect" style="background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:220px"></select>
+          </div>
+          <div class="phones" id="phones"></div>
+          <div class="panel" style="margin-top:14px">
+            <div class="panel-h"><h3>Legenda & hashtags</h3></div>
+            <div class="panel-b">
+              <div class="desc" id="previewDesc"></div>
+              <div class="hashes" id="previewHash" style="margin-top:10px"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-estudio">
+          <div class="head">
+            <div>
+              <h2>Estúdio + Chat IA</h2>
+              <p>Marcações · texto · legenda · boost · fila</p>
+            </div>
+            <select id="studioSelect" style="background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:220px"></select>
+          </div>
+          <div class="studio">
+            <div class="panel canvas-wrap">
+              <div class="canvas-tools">
+                <button class="tool active" data-tool="select">Selecionar</button>
+                <button class="tool" data-tool="mark">Marcar</button>
+                <button class="tool" data-tool="text">Texto</button>
+                <button class="tool" data-tool="clear">Limpar</button>
+                <button class="btn ghost sm" id="btnViral">Legenda viral</button>
+                <button class="btn ghost sm" id="btnBoost">Boost</button>
+                <button class="btn sm tiktok" id="btnQTT">Fila TT</button>
+                <button class="btn sm ig" id="btnQIG">Fila IG</button>
+              </div>
+              <div class="canvas-stage">
+                <div class="frame" id="frame">
+                  <img id="frameImg" alt="capa" />
+                  <video id="frameVid" style="display:none" playsinline></video>
+                  <div id="markups"></div>
+                </div>
+              </div>
+              <div class="panel-b" style="border-top:1px solid var(--line)">
+                <div class="field"><label>Título</label><input id="edTitle" /></div>
+                <div class="field"><label>Status</label>
+                  <select id="edStatus">
+                    <option value="rascunho">Rascunho</option>
+                    <option value="pronto">Pronto</option>
+                    <option value="agendado">Agendado</option>
+                    <option value="publicado">Publicado</option>
+                  </select>
+                </div>
+                <div class="field"><label>Descrição</label><div class="desc" id="edDesc" contenteditable="true"></div></div>
+                <div class="field"><label>Hashtags</label><div class="hashes" id="edHash"></div></div>
+                <button class="btn sm" id="btnSave" style="width:100%">Salvar</button>
+              </div>
+            </div>
+            <div class="panel chat">
+              <div class="chat-h">
+                <h3>✦ Assistente pro</h3>
+                <p>Peça legenda, capa, boost, agenda…</p>
+              </div>
+              <div class="chat-msgs" id="chatMsgs"></div>
+              <div class="sugs" id="sugs">
+                <button class="sug">Gera legenda bem chamativa</button>
+                <button class="sug">Troca capa sem repetir</button>
+                <button class="sug">Agenda 3 posts amanhã</button>
+                <button class="sug">Aplica boost viral</button>
+                <button class="sug">Mostra detalhes</button>
+              </div>
+              <div class="chat-in">
+                <textarea id="chatInput" rows="2" placeholder="Ex: legenda viral + boost e agenda 3 posts..."></textarea>
+                <button class="btn" id="chatSend">Enviar</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-agenda">
+          <div class="head">
+            <div>
+              <h2>Agenda · 3 vídeos/dia</h2>
+              <p>TikTok + Instagram · anti re-post · horários 11:00 · 15:30 · 20:00</p>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn sm" id="btnAutoDay2">Gerar 7 dias</button>
+              <button class="btn ghost sm" id="btnProcess">Processar fila</button>
+            </div>
+          </div>
+          <div class="split">
+            <div class="panel">
+              <div class="panel-h"><h3>Fila</h3></div>
+              <div class="panel-b" id="fullQueue" style="max-height:70vh;overflow:auto"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h3>Regras</h3></div>
+              <div class="panel-b" style="font-size:.86rem;color:var(--muted);line-height:1.5">
+                <div class="perm"><span class="check">✓</span><div><strong style="color:var(--text)">3 posts/dia</strong></div></div>
+                <div class="perm"><span class="check">✓</span><div><strong style="color:var(--text)">Nunca reposta</strong></div></div>
+                <div class="perm"><span class="check">✓</span><div><strong style="color:var(--text)">TT + IG</strong></div></div>
+                <div class="perm"><span class="check">✓</span><div><strong style="color:var(--text)">Capa + legenda antes de enfileirar</strong></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-analytics">
+          <div class="head">
+            <div>
+              <h2>Views & Boost</h2>
+              <p>Analytics estilo real · TikTok e Instagram</p>
+            </div>
+            <button class="btn sm" id="btnSimGrowth">Simular +24h</button>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><div class="l">TT views</div><div class="v" id="aTT">0</div><div class="s">totais</div></div>
+            <div class="kpi"><div class="l">IG views</div><div class="v" id="aIG">0</div><div class="s">Reels</div></div>
+            <div class="kpi"><div class="l">TT likes</div><div class="v" id="aTTL">0</div><div class="s">totais</div></div>
+            <div class="kpi"><div class="l">IG likes</div><div class="v" id="aIGL">0</div><div class="s">totais</div></div>
+            <div class="kpi"><div class="l">Com boost</div><div class="v" id="aBoost">0</div><div class="s">vídeos</div></div>
+            <div class="kpi"><div class="l">Média/post</div><div class="v" id="aAvg">0</div><div class="s">views</div></div>
+          </div>
+          <div class="split">
+            <div class="panel">
+              <div class="panel-h"><h3>Top vídeos</h3></div>
+              <div class="panel-b" id="topVideos"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h3>Semana</h3></div>
+              <div class="panel-b"><div class="chart" id="weekChart"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-contas">
+          <div class="head">
+            <div>
+              <h2>Contas TikTok + Instagram</h2>
+              <p>Permissões de publicação e insights</p>
+            </div>
+          </div>
+          <div class="split">
+            <div class="hero-box">
+              <h3>♪ TikTok</h3>
+              <p>video.publish · user.info · video.list · insights</p>
+              <div class="perms">
+                <div class="perm"><span class="check">✓</span><div>Publicar vídeos</div></div>
+                <div class="perm"><span class="check">✓</span><div>Ler perfil e @</div></div>
+                <div class="perm"><span class="check">✓</span><div>Evitar duplicatas</div></div>
+              </div>
+              <button class="btn tiktok" id="btnConnTT">Conectar TikTok</button>
+              <button class="btn ghost sm" id="btnDiscTT" style="margin-left:8px">Desconectar</button>
+            </div>
+            <div class="hero-box ig">
+              <h3>📷 Instagram</h3>
+              <p>content_publish · basic · manage_insights</p>
+              <div class="perms">
+                <div class="perm"><span class="check">✓</span><div>Publicar Reels</div></div>
+                <div class="perm"><span class="check">✓</span><div>Legendas e hashtags</div></div>
+                <div class="perm"><span class="check">✓</span><div>Views e alcance</div></div>
+              </div>
+              <button class="btn ig" id="btnConnIG">Conectar Instagram</button>
+              <button class="btn ghost sm" id="btnDiscIG" style="margin-left:8px">Desconectar</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">Autorização</h3>
+      <p id="modalText">Permitir acesso?</p>
+      <div class="field"><label>@ da conta</label><input id="modalUser" value="@luxury.garage" /></div>
+      <div class="actions">
+        <button class="btn ghost" id="modalCancel">Negar</button>
+        <button class="btn" id="modalAllow">Permitir</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="data/library.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("btnEnter2")?.addEventListener("click", () => {
+      document.getElementById("btnEnter").click();
+    });
+    document.querySelector("[data-view-later]")?.addEventListener("click", () => {
+      document.getElementById("btnEnter").click();
+      setTimeout(() => {
+        document.querySelector('[data-view="import"]')?.click();
+      }, 100);
+    });
+  </script>
+</body>
+</html>
