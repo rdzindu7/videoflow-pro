@@ -363,17 +363,21 @@
                 <div class="ed-section-title">Volumes</div>
                 <div class="slider-row"><span>Video</span><input type="range" id="edVolVideo" min="0" max="1" step="0.01" value="1" /><span id="edVolVideoVal">100%</span></div>
                 <div class="slider-row"><span>Musica</span><input type="range" id="edVolMusic" min="0" max="1" step="0.01" value="0.32" /><span>32%</span></div>
-                <div class="ed-section-title">Musica por nome</div>
+                <div class="ed-section-title">Musicas (YouTube — melhores partes)</div>
                 <div class="music-search-row">
-                  <input id="edMusicSearch" type="search" placeholder="Digite o nome: Midnight Drive, Neon, Luxury..." />
+                  <input id="edMusicSearch" type="search" placeholder="Skyfall, PROOF, Billionaire, Millionaire, Vibes..." />
                   <button class="btn sm" type="button" id="edMusicSearchBtn">Buscar</button>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0">
-                  <label class="btn ghost sm" style="cursor:pointer">Upload MP3<input type="file" id="edMusicFile" accept="audio/*,.mp3,.wav,.m4a,.aac" hidden /></label>
+                  <label class="btn ghost sm" style="cursor:pointer">Upload MP3 (opcional)<input type="file" id="edMusicFile" accept="audio/*,.mp3,.wav,.m4a,.aac" hidden /></label>
                   <button class="btn ghost sm" type="button" id="edMusicClear">Remover trilha</button>
                   <span id="edMusicName" style="font-size:.78rem;color:var(--gold2)">Nenhuma trilha</span>
                 </div>
                 <div id="edMusicList" class="music-list"></div>
+                <iframe id="edYtMusic" title="YouTube music preview" style="display:none;width:100%;height:120px;border:0;border-radius:10px;margin:8px 0;background:#000" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <div class="note" style="margin:6px 0 10px">
+                  Biblioteca: so as 6 faixas que voce pediu (melhores trechos). Preview via YouTube — nao hospedamos o audio (copyright).
+                </div>
                 <div id="edDemoMusic" style="display:none"></div>
                 <div class="ed-section-title">Velocidade e look</div>
                 <div class="slider-row"><span>Speed</span><input type="range" id="edSpeed" min="0.25" max="2" step="0.05" value="1" /><span id="edSpeedVal">1.00x</span></div>
@@ -661,13 +665,13 @@ POST /v2/post/publish/creator_info/query/</div>
 
   <script src="data/library.js?v=lux1"></script>
   <script src="js/brand.js?v=lux1"></script>
-  <script src="js/music-library.js?v=lux1"></script>
+  <script src="js/music-library.js?v=ytmusic1"></script>
   <script src="js/ai-engine.js?v=lux1"></script>
-  <script src="js/auto-combine.js?v=lux1"></script>
-  <script src="js/editor.js?v=lux1"></script>
+  <script src="js/auto-combine.js?v=ytmusic1"></script>
+  <script src="js/editor.js?v=ytmusic1"></script>
   <script src="js/tiktok-api.js?v=lux1"></script>
   <script src="js/app.js?v=lux1"></script>
-  <script src="js/editor-bridge.js?v=lux1"></script>
+  <script src="js/editor-bridge.js?v=ytmusic1"></script>
   <script src="js/tiktok-bridge.js?v=lux1"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", function () {

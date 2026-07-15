@@ -116,7 +116,7 @@ window.VideoFlowEditor = (function () {
           textY: 78,
           flashIntro: true,
         });
-        pickMusic(e, video, "Midnight Drive");
+        pickMusic(e, video, "Estilo Bilionario");
       },
     },
     viral: {
@@ -141,7 +141,7 @@ window.VideoFlowEditor = (function () {
           textSize: 30,
           textY: 72,
         });
-        pickMusic(e, video, "Supercar Anthem");
+        pickMusic(e, video, "PROOF");
       },
     },
     cinematic: {
@@ -162,7 +162,7 @@ window.VideoFlowEditor = (function () {
           textOverlay: "",
           hue: -6,
         });
-        pickMusic(e, video, "Airstrip Takeoff");
+        pickMusic(e, video, "Billionaire Lifestyle");
       },
     },
     night: {
@@ -184,7 +184,7 @@ window.VideoFlowEditor = (function () {
           textOverlay: "NIGHT DRIVE",
           textSize: 32,
         });
-        pickMusic(e, video, "Neon District");
+        pickMusic(e, video, "Skyfall");
       },
     },
     silence_music: {
@@ -232,7 +232,7 @@ window.VideoFlowEditor = (function () {
           textY: 70,
           flashIntro: true,
         });
-        pickMusic(e, video, "Garage Flex");
+        pickMusic(e, video, "PROOF — Drop");
       },
     },
   };
@@ -247,7 +247,11 @@ window.VideoFlowEditor = (function () {
   function applyTrack(e, track) {
     e.musicId = track.id;
     e.musicName = track.name + " — " + track.artist;
-    e.musicUrl = track.url;
+    e.musicUrl = track.url || "";
+    e.musicSource = track.source || "file";
+    e.youtubeId = track.youtubeId || "";
+    e.musicStart = track.start || 0;
+    e.musicEnd = track.end || 0;
   }
 
   function runAuto(id, modeKey, video) {
@@ -283,8 +287,39 @@ window.VideoFlowEditor = (function () {
 
   function syncMusicElement(e) {
     const { music, video: v } = els();
+    const ytBox = document.querySelector("#edYtMusic");
+    // YouTube tracks: use embed (best segment), pause HTML audio
+    if (e.musicSource === "youtube" && e.youtubeId) {
+      if (music) {
+        music.pause();
+        music.removeAttribute("src");
+      }
+      if (ytBox) {
+        const start = e.musicStart || 0;
+        const end = e.musicEnd || "";
+        let src =
+          "https://www.youtube.com/embed/" +
+          e.youtubeId +
+          "?enablejsapi=1&rel=0&start=" +
+          start;
+        if (end) src += "&end=" + end;
+        // autoplay only if video is playing
+        if (v && !v.paused) src += "&autoplay=1";
+        if (ytBox.dataset.src !== src) {
+          ytBox.src = src;
+          ytBox.dataset.src = src;
+        }
+        ytBox.style.display = "block";
+      }
+      return;
+    }
+    if (ytBox) {
+      ytBox.style.display = "none";
+      ytBox.removeAttribute("src");
+      ytBox.dataset.src = "";
+    }
     if (!music) return;
-    if (e.musicUrl) {
+    if (e.musicUrl && !/^https?:\/\/(www\.)?youtube\.com/i.test(e.musicUrl)) {
       if (music.getAttribute("src") !== e.musicUrl) {
         music.src = e.musicUrl;
       }

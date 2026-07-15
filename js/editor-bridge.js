@@ -223,37 +223,49 @@
     const list = M.search(query || "");
     const cur = A?.getSelected() ? E.getEdit(A.getSelected().id) : {};
     box.innerHTML = list
-      .map(
-        (t) => `
+      .map((t) => {
+        const seg =
+          t.start != null
+            ? ` · melhor parte ${fmtSec(t.start)}–${fmtSec(t.end || t.start + 60)}`
+            : "";
+        return `
       <div class="music-item ${cur.musicId === t.id ? "on" : ""}" data-id="${t.id}">
         <div>
           <strong>${esc(t.name)}</strong>
-          <small>${esc(t.artist)} · ${esc(t.mood)} · ${t.bpm} BPM</small>
+          <small>${esc(t.artist)} · ${esc(t.mood)}${seg}</small>
         </div>
         <button class="btn ghost sm" type="button" data-play="${t.id}">Usar</button>
-      </div>`
-      )
+      </div>`;
+      })
       .join("") || `<div style="color:var(--muted);font-size:.82rem;padding:8px">Nenhuma musica com esse nome</div>`;
 
     box.querySelectorAll(".music-item").forEach((row) => {
       const apply = () => {
         const v = A.getSelected();
-        if (!v) return;
+        if (!v) return toast("Selecione um video");
         const track = M.byId(row.dataset.id);
         if (!track) return;
         E.applyTrack(E.getEdit(v.id), track);
         E.syncMusicElement(E.getEdit(v.id));
         E.applyToPlayer();
-        if ($("#edMusicName")) $("#edMusicName").textContent = track.name + " — " + track.artist;
-        toast("Musica: " + track.name);
+        if ($("#edMusicName")) {
+          $("#edMusicName").textContent =
+            track.name +
+            (track.start != null ? ` (${fmtSec(track.start)}–${fmtSec(track.end)})` : "");
+        }
+        toast("Trilha: " + track.name);
         renderMusicList($("#edMusicSearch")?.value || "");
         A.save?.();
       };
-      row.addEventListener("click", (ev) => {
-        if (ev.target.closest("button") || ev.target.dataset.play) apply();
-        else apply();
-      });
+      row.addEventListener("click", () => apply());
     });
+  }
+
+  function fmtSec(s) {
+    s = Math.max(0, Number(s) || 0);
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ":" + String(sec).padStart(2, "0");
   }
 
   function runAutoMode(mode) {

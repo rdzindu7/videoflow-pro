@@ -8,16 +8,16 @@ window.LIBRARY = {
     "version":  5,
     "demoMusic":  [
                       {
-                          "name":  "Midnight Drive",
-                          "url":  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                          "name":  "Estilo Bilionario — Hook",
+                          "url":  "https://www.youtube.com/watch?v=UynCG_el504\u0026t=15s"
                       },
                       {
-                          "name":  "Gold Coast Pulse",
-                          "url":  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+                          "name":  "Skyfall Drop",
+                          "url":  "https://www.youtube.com/watch?v=ZPGJrC48o_w\u0026t=70s"
                       },
                       {
-                          "name":  "Penthouse Ambient",
-                          "url":  "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+                          "name":  "PROOF — Drop",
+                          "url":  "https://www.youtube.com/watch?v=7v0Njj4MR9E\u0026t=180s"
                       }
                   ],
     "coverPool":  [
