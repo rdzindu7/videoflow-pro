@@ -795,10 +795,13 @@ ${tags.join(" ")}`;
       img.style.display = "block";
       img.src = coverSrc(v);
     }
-    $("#edTitle").value = v.title;
-    $("#edStatus").value = v.status;
-    $("#edDesc").textContent = v.description || "";
-    $("#edHash").innerHTML = extractHash(v.description || "")
+    const tEl = $("#stTitle") || $("#edTitle");
+    const sEl = $("#stStatus") || $("#edStatus");
+    const dEl = $("#stDesc") || $("#edDesc");
+    if (tEl) tEl.value = v.title;
+    if (sEl) sEl.value = v.status;
+    if (dEl) dEl.textContent = v.description || "";
+    if ($("#edHash")) $("#edHash").innerHTML = extractHash(v.description || "")
       .concat(pickTags(v))
       .filter((x, i, a) => a.indexOf(x) === i)
       .slice(0, 14)
