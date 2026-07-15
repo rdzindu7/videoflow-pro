@@ -1,8 +1,17 @@
 /**
- * Wire TikTok Content Posting API into VideoFlow UI
+ * Wire TikTok Content Posting API into LUXECUT UI
+ * Auto-setup: preenche Client Key + redirect + privacidade.
+ * Client Secret NUNCA vai no GitHub — so localStorage apos voce colar 1x.
  */
 (function () {
   const $ = (s) => document.querySelector(s);
+
+  // Client Key do app "Style"/LUXECUT (publico no fluxo OAuth)
+  const DEFAULTS = {
+    clientKey: "aw6c4eqjlnexy4vw",
+    privacyLevel: "PUBLIC_TO_EVERYONE",
+    appName: "LUXECUT",
+  };
 
   function log(msg) {
     const el = $("#ttApiLog");
@@ -24,25 +33,108 @@
     const TT = window.TikTokAPI;
     if (!TT) return;
     const c = TT.loadCfg();
-    if ($("#ttClientKey")) $("#ttClientKey").value = c.clientKey || "";
+    // auto-preencher key se vazio
+    const key = c.clientKey || DEFAULTS.clientKey;
+    if ($("#ttClientKey")) $("#ttClientKey").value = key;
     if ($("#ttClientSecret")) $("#ttClientSecret").value = c.clientSecret || "";
     if ($("#ttAccessToken")) $("#ttAccessToken").value = c.accessToken || "";
     if ($("#ttProxyUrl")) $("#ttProxyUrl").value = c.proxyUrl || "";
-    if ($("#ttPrivacy")) $("#ttPrivacy").value = c.privacyLevel || "PUBLIC_TO_EVERYONE";
+    if ($("#ttPrivacy")) $("#ttPrivacy").value = c.privacyLevel || DEFAULTS.privacyLevel;
     if ($("#ttRedirect")) $("#ttRedirect").value = TT.redirectUriDefault();
     const label = $("#ttAccountLabel");
     if (label) {
       label.textContent = c.accessToken
-        ? `Token salvo${c.openId ? " · open_id " + c.openId : ""}${c.creatorUsername ? " · @" + c.creatorUsername : ""}`
-        : "Desconectado · cole Access Token ou use OAuth";
+        ? `Conectado${c.openId ? " · open_id " + c.openId : ""}${c.creatorUsername ? " · @" + c.creatorUsername : ""}`
+        : key
+          ? "Key pronta · falta Secret + OAuth ou Access Token"
+          : "Desconectado";
     }
     // OAuth callback ?code=
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
     const state = params.get("state");
-    if (code && (state === "vf" || !state)) {
+    if (code && (state === "vf" || !state || state === "luxecut")) {
       handleOAuthCode(code);
       history.replaceState(null, "", location.pathname + location.hash);
+    }
+  }
+
+  /** Preenche tudo que da pra automatizar sem expor secret no codigo */
+  function autoSetupAll() {
+    const TT = window.TikTokAPI;
+    if (!TT) return toast("API TikTok nao carregou");
+
+    const redirect = TT.redirectUriDefault();
+    const existing = TT.loadCfg();
+
+    // Secret: so pede se ainda nao tiver no navegador
+    let secret = existing.clientSecret || ($("#ttClientSecret")?.value || "").trim();
+    if (!secret) {
+      secret = (prompt(
+        "Cole o Client Secret do TikTok (fica so no seu navegador, nao no GitHub):\n\nPortal → App → Credentials → Client secret",
+        ""
+      ) || "").trim();
+    }
+
+    const token = existing.accessToken || ($("#ttAccessToken")?.value || "").trim();
+
+    TT.saveCfg({
+      clientKey: DEFAULTS.clientKey,
+      clientSecret: secret || existing.clientSecret || "",
+      accessToken: token,
+      privacyLevel: DEFAULTS.privacyLevel,
+      proxyUrl: ($("#ttProxyUrl")?.value || existing.proxyUrl || "").trim(),
+      redirectUri: redirect,
+      appName: DEFAULTS.appName,
+      autoConfigured: true,
+    });
+
+    if ($("#ttClientKey")) $("#ttClientKey").value = DEFAULTS.clientKey;
+    if ($("#ttClientSecret") && secret) $("#ttClientSecret").value = secret;
+    if ($("#ttPrivacy")) $("#ttPrivacy").value = DEFAULTS.privacyLevel;
+    if ($("#ttRedirect")) $("#ttRedirect").value = redirect;
+
+    log("AUTO-SETUP LUXECUT");
+    log("Client Key: " + DEFAULTS.clientKey);
+    log("Redirect URI: " + redirect);
+    log("Privacy: " + DEFAULTS.privacyLevel);
+    log(
+      secret
+        ? "Client Secret: salvo localmente (ok)"
+        : "Client Secret: AINDA FALTA — cole no campo e Salvar"
+    );
+    log("No portal TikTok confira:");
+    log("1) App name: LUXECUT");
+    log("2) Redirect URI exatamente: " + redirect);
+    log("3) Products: Login Kit + Content Posting API");
+    log("4) Scopes: user.info.basic, video.upload, video.publish");
+    log("5) Save + Submit for review (producao)");
+
+    const A = window.VideoFlowApp;
+    if (A) {
+      const st = A.getState();
+      st.accounts.tiktok = {
+        connected: !!(secret || token),
+        user: token ? "@conectando" : "@pendente",
+        at: new Date().toISOString(),
+        realApi: !!token,
+        clientKey: DEFAULTS.clientKey,
+      };
+      A.save();
+      A.renderAll?.();
+    }
+
+    fillForm();
+    toast(secret || token ? "TikTok configurado — use OAuth ou Token" : "Key ok — cole o Secret");
+
+    // se tem secret e nao tem token, oferece OAuth
+    if (secret && !token) {
+      const go = confirm(
+        "Configuracao salva.\n\nAbrir login OAuth do TikTok agora para gerar Access Token?"
+      );
+      if (go) startOAuth();
+    } else if (token) {
+      creatorInfo().catch(() => {});
     }
   }
 
@@ -255,11 +347,29 @@
       setTimeout(wire, 100);
       return;
     }
+    // auto: grava client key padrao se ainda nao tiver
+    const cfg = window.TikTokAPI.loadCfg();
+    if (!cfg.clientKey) {
+      window.TikTokAPI.saveCfg({
+        clientKey: DEFAULTS.clientKey,
+        privacyLevel: DEFAULTS.privacyLevel,
+        appName: DEFAULTS.appName,
+      });
+    }
     fillForm();
+
     $("#ttSaveKeys")?.addEventListener("click", saveKeys);
     $("#ttOAuth")?.addEventListener("click", startOAuth);
     $("#ttCreatorInfo")?.addEventListener("click", creatorInfo);
     $("#ttPublishSelected")?.addEventListener("click", publishSelected);
+    $("#ttAutoSetup")?.addEventListener("click", autoSetupAll);
+    $("#ttCopyRedirect")?.addEventListener("click", () => {
+      const v = $("#ttRedirect")?.value || window.TikTokAPI.redirectUriDefault();
+      navigator.clipboard?.writeText(v).then(
+        () => toast("Redirect URI copiada"),
+        () => prompt("Copie a Redirect URI:", v)
+      );
+    });
     $("#ttTestStatus")?.addEventListener("click", async () => {
       try {
         saveKeys();
@@ -274,10 +384,21 @@
       }
     });
 
-    // when opening contas
     document.querySelectorAll('[data-view="contas"]').forEach((btn) => {
       btn.addEventListener("click", () => setTimeout(fillForm, 50));
     });
+
+    // se veio com ?tt_setup=1 abre contas e roda auto
+    const params = new URLSearchParams(location.search);
+    if (params.get("tt_setup") === "1") {
+      setTimeout(() => {
+        window.VideoFlowApp?.enterApp?.();
+        setTimeout(() => {
+          window.VideoFlowApp?.setView?.("contas");
+          autoSetupAll();
+        }, 400);
+      }, 300);
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);

@@ -607,11 +607,17 @@
                 </select>
               </div>
               <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+                <button class="btn tiktok" type="button" id="ttAutoSetup">Configurar tudo automatico</button>
+                <button class="btn ghost sm" type="button" id="ttCopyRedirect">Copiar Redirect URI</button>
                 <button class="btn sm" type="button" id="ttSaveKeys">Salvar keys</button>
                 <button class="btn tiktok sm" type="button" id="ttOAuth">OAuth Login TikTok</button>
                 <button class="btn ghost sm" type="button" id="ttCreatorInfo">Query creator_info</button>
-                <button class="btn sm" type="button" id="ttPublishSelected">Publicar video selecionado (API real)</button>
+                <button class="btn sm" type="button" id="ttPublishSelected">Publicar video (API real)</button>
                 <button class="btn ghost sm" type="button" id="ttTestStatus">Testar status API</button>
+              </div>
+              <div class="note" style="margin-top:10px">
+                Automatico preenche: Client Key do seu app, Redirect URI do LUXECUT, privacidade PUBLIC.
+                Client Secret voce cola 1 vez (nao vai pro GitHub). Depois OAuth gera o Access Token.
               </div>
               <div class="note" id="ttApiLog" style="margin-top:12px;max-height:160px;overflow:auto;white-space:pre-wrap">Log da API aparece aqui.
 Endpoints:
@@ -672,7 +678,7 @@ POST /v2/post/publish/creator_info/query/</div>
   <script src="js/tiktok-api.js?v=novid1"></script>
   <script src="js/app.js?v=clear2"></script>
   <script src="js/editor-bridge.js?v=novid1"></script>
-  <script src="js/tiktok-bridge.js?v=novid1"></script>
+  <script src="js/tiktok-bridge.js?v=auto1"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", function () {
       document.getElementById("btnEnter")?.click();
