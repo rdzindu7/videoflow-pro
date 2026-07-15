@@ -97,6 +97,32 @@ a { color: var(--gold2); }
   background: linear-gradient(135deg, #c9a227, #8a7018);
   display: grid; place-items: center; font-weight: 800; font-size: .85rem; color: #0a0906;
 }
+.logo-img {
+  width: 40px; height: 40px; border-radius: 12px; object-fit: cover;
+  border: 1px solid rgba(201,162,39,.35);
+  box-shadow: 0 6px 18px rgba(201,162,39,.25);
+}
+.project-card {
+  border: 1px solid var(--line); border-radius: 16px; padding: 14px;
+  background: rgba(255,255,255,.03); margin-bottom: 12px;
+}
+.project-card.on { border-color: rgba(201,162,39,.45); }
+.project-top {
+  display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: start;
+}
+.project-top img {
+  width: 56px; height: 72px; object-fit: cover; border-radius: 10px;
+}
+.project-top h4 { margin: 0 0 4px; font-size: .95rem; }
+.project-top p { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.35; }
+.project-notes {
+  display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0;
+}
+.project-notes span {
+  font-size: .7rem; color: var(--muted); background: rgba(0,0,0,.28);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px;
+}
+.project-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
 .brand h1 { margin: 0; font-size: .95rem; }
 .brand small { color: var(--muted); font-size: .68rem; }
 .tabs { display: flex; gap: 4px; flex: 1; overflow-x: auto; }

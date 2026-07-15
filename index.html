@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="VideoFlow Pro - organizacao 9:16, capas luxury cars, legendas, agenda TikTok e Instagram" />
+  <meta name="description" content="LUXECUT - Auto-edit. Auto-mix. Luxury feed. Capas separadas, IA junta clips e musica." />
   <meta name="theme-color" content="#05060a" />
-  <title>VideoFlow Pro | TikTok + Instagram | Luxury Cars 9:16</title>
+  <title>LUXECUT | Auto-edit. Auto-mix. Luxury feed.</title>
+  <link rel="apple-touch-icon" href="assets/icon-luxecut.jpg" />
   <script>
     (function () {
       var p = location.pathname || "/";
@@ -22,46 +23,45 @@
     })();
   </script>
   <link rel="stylesheet" href="css/app.css" />
-  <link rel="icon" href="covers/car-01-mansao.jpg" />
+  <link rel="icon" href="assets/icon-luxecut.jpg" />
 </head>
 <body>
   <!-- LANDING -->
   <div class="landing" id="landing">
     <nav class="landing-nav">
       <div class="brand">
-        <div class="logo">VF</div>
+        <img class="logo-img" src="assets/icon-luxecut.jpg" alt="LUXECUT" width="40" height="40" />
         <div>
-          <h1>VideoFlow Pro</h1>
-          <small>GitHub · Online · 9:16</small>
+          <h1>LUXECUT</h1>
+          <small>Auto-edit. Auto-mix. Luxury feed.</small>
         </div>
       </div>
       <div style="display:flex;gap:8px">
         <a class="btn ghost sm" href="https://github.com/rdzindu7/videoflow-pro" id="repoLink" target="_blank" rel="noopener">GitHub</a>
-        <button class="btn sm" id="btnEnter" type="button">Abrir painel</button>
+        <button class="btn sm" id="btnEnter" type="button">Abrir studio</button>
       </div>
     </nav>
 
     <section class="landing-hero">
       <div>
-        <h1>Postagens com capas de <span>carros de luxo</span> em 9:16</h1>
+        <h1><span>LUXECUT</span> — o corte automatico do seu feed de luxo</h1>
         <p>
-          Organize videos, capas premium, legendas virais e hashtags,
-          agenda <strong>3 posts por dia</strong> no TikTok e Instagram,
-          anti re-post, boost de views e preview real.
+          Voce adiciona os videos. A IA junta os que combinam, escolhe musica,
+          aplica edit profissional e legenda curta. Capas ficam <strong>separadas</strong> dos clips.
         </p>
         <div class="hero-actions">
           <button class="btn" id="btnEnter2" type="button">Comecar agora</button>
-          <button class="btn ghost" type="button" data-view-later="import">Importar meus videos</button>
+          <button class="btn ghost" type="button" data-view-later="import">Adicionar meus videos</button>
         </div>
         <p style="margin-top:16px;font-size:.82rem;color:var(--muted)">
-          Editor Pro · mute/musica · Full HD-8K · IA de legendas · 12 capas 9:16
+          Biblioteca vazia · Auto Mix IA · Editor Pro Max · 12 capas · TikTok API
         </p>
       </div>
       <div class="hero-card">
-        <img id="heroImg" src="covers/car-01-mansao.jpg" alt="Capa luxury car" />
+        <img id="heroImg" src="assets/logo-luxecut.jpg" alt="LUXECUT logo" />
         <div class="overlay">
-          <div style="font-weight:700;font-size:.95rem">Luxury Cars · 9:16</div>
-          <div style="font-size:.8rem;opacity:.85;margin-top:4px">Mansoes · Riviera · Jet · Penthouse</div>
+          <div style="font-weight:700;font-size:.95rem">LUXECUT</div>
+          <div style="font-size:.8rem;opacity:.85;margin-top:4px">Auto-edit · Auto-mix · 9:16</div>
         </div>
       </div>
     </section>
@@ -98,21 +98,22 @@
   <div class="shell" id="shell">
     <header class="top">
       <div class="brand">
-        <div class="logo">VF</div>
+        <img class="logo-img" src="assets/icon-luxecut.jpg" alt="LUXECUT" width="36" height="36" />
         <div>
-          <h1>VideoFlow Pro</h1>
-          <small>9:16 · Luxury · TT+IG</small>
+          <h1>LUXECUT</h1>
+          <small>Auto-mix · 9:16 · TT+IG</small>
         </div>
       </div>
       <nav class="tabs">
         <button class="tab active" type="button" data-view="dashboard">Dashboard</button>
         <button class="tab" type="button" data-view="import">Importar</button>
-        <button class="tab" type="button" data-view="biblioteca">Biblioteca</button>
+        <button class="tab" type="button" data-view="biblioteca">Videos</button>
         <button class="tab" type="button" data-view="capas">Capas</button>
+        <button class="tab" type="button" data-view="automix">Auto Mix IA</button>
         <button class="tab" type="button" data-view="preview">Preview</button>
-        <button class="tab" type="button" data-view="editor">Editor Pro + IA</button>
+        <button class="tab" type="button" data-view="editor">Editor Pro</button>
         <button class="tab" type="button" data-view="estudio">Estudio</button>
-        <button class="tab" type="button" data-view="agenda">Agenda 3/dia</button>
+        <button class="tab" type="button" data-view="agenda">Agenda</button>
         <button class="tab" type="button" data-view="analytics">Views</button>
         <button class="tab" type="button" data-view="contas">Contas</button>
       </nav>
@@ -127,20 +128,22 @@
       <aside class="side">
         <div class="side-label">Operacao</div>
         <button class="nav active" type="button" data-view="dashboard"><span class="ico">▣</span> Dashboard</button>
-        <button class="nav" type="button" data-view="import"><span class="ico">↑</span> Importar videos</button>
-        <button class="nav" type="button" data-view="biblioteca"><span class="ico">▮</span> Biblioteca <span class="c" id="cLib">0</span></button>
-        <button class="nav" type="button" data-view="capas"><span class="ico">▣</span> Capas 9:16</button>
-        <button class="nav" type="button" data-view="preview"><span class="ico">▣</span> Preview real</button>
+        <button class="nav" type="button" data-view="import"><span class="ico">↑</span> Adicionar videos</button>
+        <button class="nav" type="button" data-view="biblioteca"><span class="ico">▮</span> Videos <span class="c" id="cLib">0</span></button>
+        <button class="nav" type="button" data-view="capas"><span class="ico">▣</span> Capas (separadas)</button>
+        <button class="nav" type="button" data-view="automix"><span class="ico">✦</span> Auto Mix IA</button>
+        <button class="nav" type="button" data-view="preview"><span class="ico">▣</span> Preview</button>
         <div class="side-label">Criacao</div>
-        <button class="nav" type="button" data-view="editor"><span class="ico">✦</span> Editor Pro + IA</button>
+        <button class="nav" type="button" data-view="editor"><span class="ico">▶</span> Editor Pro</button>
         <button class="nav" type="button" data-view="estudio"><span class="ico">✎</span> Estudio</button>
         <div class="side-label">Publicacao</div>
         <button class="nav" type="button" data-view="agenda"><span class="ico">☰</span> Agenda <span class="c" id="cQ">0</span></button>
         <button class="nav" type="button" data-view="analytics"><span class="ico">▤</span> Views e Boost</button>
         <button class="nav" type="button" data-view="contas"><span class="ico">⚙</span> Contas TT+IG</button>
         <div class="side-foot">
-          <strong>Regras ativas</strong>
-          Tudo 9:16 · 3 posts/dia · anti re-post · capas sem repetir · legendas virais · boost
+          <strong>LUXECUT</strong>
+          Voce adiciona · IA junta clips · musica auto · capa separada · legenda curta
+          <button class="btn danger sm" type="button" id="btnClearLib" style="margin-top:10px;width:100%">Limpar biblioteca</button>
         </div>
       </aside>
 
@@ -148,17 +151,21 @@
         <section class="view active" id="view-dashboard">
           <div class="head">
             <div>
-              <h2>Central de operacao</h2>
-              <p>Catalogo online · capas luxury · automacao TikTok + Instagram</p>
+              <h2>LUXECUT · central</h2>
+              <p>Biblioteca vazia por padrao · voce adiciona · IA monta packs</p>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn ghost sm" type="button" id="btnRegenAll">Legendas virais</button>
-              <button class="btn ghost sm" type="button" id="btnReassignCovers">Capas unicas</button>
-              <button class="btn sm" type="button" data-view="import">Importar MP4</button>
+              <button class="btn ghost sm" type="button" id="btnRegenAll">Legendas curtas</button>
+              <button class="btn sm" type="button" data-view="automix">Auto Mix IA</button>
+              <button class="btn sm" type="button" data-view="import">Adicionar MP4</button>
             </div>
           </div>
+          <div id="emptyLibHint" class="note" style="margin-bottom:14px">
+            Nenhum video na biblioteca. Va em <strong>Adicionar videos</strong>, depois use <strong>Auto Mix IA</strong>
+            para juntar clips + musica + edit automatico. Capas ficam na aba Capas (separadas).
+          </div>
           <div class="kpis">
-            <div class="kpi"><div class="l">Biblioteca</div><div class="v" id="kTotal">0</div><div class="s">videos</div></div>
+            <div class="kpi"><div class="l">Seus videos</div><div class="v" id="kTotal">0</div><div class="s">na biblioteca</div></div>
             <div class="kpi"><div class="l">Livres</div><div class="v" id="kReady">0</div><div class="s">nunca postados</div></div>
             <div class="kpi"><div class="l">Postados</div><div class="v" id="kPosted">0</div><div class="s">bloqueados</div></div>
             <div class="kpi"><div class="l">Fila hoje</div><div class="v" id="kToday">0</div><div class="s">meta 3/dia</div></div>
@@ -171,19 +178,15 @@
               <div class="panel-b" id="todayQueue"></div>
             </div>
             <div class="panel">
-              <div class="panel-h"><h3>Como usar online</h3></div>
+              <div class="panel-h"><h3>Fluxo LUXECUT</h3></div>
               <div class="panel-b" style="font-size:.86rem;color:var(--muted);line-height:1.55">
                 <ol style="margin:0;padding-left:1.1rem">
-                  <li>Importe seus MP4 (arraste ou botao Importar)</li>
-                  <li>Conecte TikTok e Instagram em Contas</li>
-                  <li>Gere legendas + capas automaticas</li>
-                  <li>Clique em <strong>Gerar dia (3)</strong></li>
-                  <li>Processe a fila e acompanhe views/boost</li>
+                  <li><strong>Adicionar</strong> so os videos que voce quiser</li>
+                  <li><strong>Capas</strong> ficam separadas — atribua quando quiser</li>
+                  <li><strong>Auto Mix IA</strong> junta clips + musica + edit</li>
+                  <li>Abra o pack no <strong>Editor Pro</strong></li>
+                  <li>Agenda 3/dia + Contas TikTok API</li>
                 </ol>
-                <div class="note">
-                  Capas e o app rodam no GitHub Pages. Postagem real exige API (TikTok Developers + Meta).
-                  Em Contas voce cola Client Key e Access Token da Content Posting API.
-                </div>
               </div>
             </div>
           </div>
@@ -192,18 +195,55 @@
         <section class="view" id="view-import">
           <div class="head">
             <div>
-              <h2>Importar videos</h2>
-              <p>Arraste MP4/MOV · recebe capa 9:16 + legenda viral automatico</p>
+              <h2>Adicionar seus videos</h2>
+              <p>Nada pre-carregado · so o que voce escolher · capas NAO vem grudadas</p>
             </div>
           </div>
           <div class="dropzone" id="dropzone">
-            <h3>Solte os videos aqui</h3>
-            <p>ou clique para escolher arquivos · formato 9:16</p>
+            <h3>Solte seus MP4 aqui</h3>
+            <p>ou clique para escolher · legenda curta automatica (max 5 #)</p>
             <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.webm,.mkv" multiple hidden />
           </div>
           <div class="note" style="margin-top:14px">
-            Dica: selecione os arquivos de Documents/trabalho. Eles ficam no navegador (nao sobem ao GitHub).
+            Videos ficam so no seu navegador. Capas estao na aba Capas — atribua depois. Depois va em Auto Mix IA.
           </div>
+        </section>
+
+        <section class="view" id="view-automix">
+          <div class="head">
+            <div>
+              <h2>Auto Mix IA</h2>
+              <p>Junta videos que combinam · escolhe musica · auto-edit · legenda curta · capa separada</p>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:14px">
+            <div class="panel-b">
+              <div class="ed-grid-2">
+                <div class="field">
+                  <label>Estilo do pack</label>
+                  <select id="autoMixStyle">
+                    <option value="reels">Reels Ready</option>
+                    <option value="luxury">Luxury Sequence</option>
+                    <option value="viral">Viral Pack</option>
+                    <option value="cinematic">Cinematic Cut</option>
+                    <option value="night">Night Run</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Acao</label>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn" type="button" id="btnAutoMix">Gerar packs IA</button>
+                    <button class="btn ghost sm" type="button" id="btnManualPack">Pack com selecionados</button>
+                  </div>
+                </div>
+              </div>
+              <div class="note">
+                A IA analisa nome/sequencia dos clips, agrupa os que ficam bem juntos, escolhe musica por estilo,
+                aplica modo auto-edit e legenda curta (max 5 hashtags, CTA seguir). Capas do pool 9:16 ficam separadas.
+              </div>
+            </div>
+          </div>
+          <div id="projectList"></div>
         </section>
 
         <section class="view" id="view-biblioteca">
@@ -227,10 +267,10 @@
         <section class="view" id="view-capas">
           <div class="head">
             <div>
-              <h2>Capas automaticas 9:16</h2>
-              <p>Luxury cars em lugares ultra-ricos · distribuicao sem repetir em sequencia</p>
+              <h2>Capas (separadas dos videos)</h2>
+              <p>Pool 9:16 luxury · atribua manualmente ao video selecionado · nao vem colado no import</p>
             </div>
-            <button class="btn sm" type="button" id="btnReassignCovers2">Redistribuir</button>
+            <button class="btn ghost sm" type="button" data-view="biblioteca">Ir aos videos</button>
           </div>
           <div class="cover-gallery" id="coverGallery"></div>
           <div class="panel" style="margin-top:14px">
@@ -619,14 +659,16 @@ POST /v2/post/publish/creator_info/query/</div>
   </div>
   <div class="toast" id="toast"></div>
 
-  <script src="data/library.js?v=short3"></script>
-  <script src="js/music-library.js"></script>
-  <script src="js/ai-engine.js?v=short3"></script>
-  <script src="js/editor.js"></script>
-  <script src="js/tiktok-api.js"></script>
-  <script src="js/app.js?v=short3"></script>
-  <script src="js/editor-bridge.js"></script>
-  <script src="js/tiktok-bridge.js"></script>
+  <script src="data/library.js?v=lux1"></script>
+  <script src="js/brand.js?v=lux1"></script>
+  <script src="js/music-library.js?v=lux1"></script>
+  <script src="js/ai-engine.js?v=lux1"></script>
+  <script src="js/auto-combine.js?v=lux1"></script>
+  <script src="js/editor.js?v=lux1"></script>
+  <script src="js/tiktok-api.js?v=lux1"></script>
+  <script src="js/app.js?v=lux1"></script>
+  <script src="js/editor-bridge.js?v=lux1"></script>
+  <script src="js/tiktok-bridge.js?v=lux1"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", function () {
       document.getElementById("btnEnter")?.click();

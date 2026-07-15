@@ -35,8 +35,12 @@
   }
 
   const LIB = window.LIBRARY || { videos: [], coverPool: [], postsPerDay: 3 };
-  const STORAGE_KEY = "vf_pro_cloud_v3_shortcap";
+  const STORAGE_KEY = "luxecut_v1_empty";
   const fileBlobs = new Map(); // id -> objectURL
+  let projects = [];
+  let selectedProjectId = null;
+  let multiClipQueue = []; // sequential play for combined projects
+  let multiClipIndex = 0;
 
   // Legendas curtas: curiosidade + seguir, max 5 #, sem detalhes do video
   const VIRAL_HOOKS = [
@@ -53,25 +57,33 @@
     "#fyp", "#foryou", "#viral", "#supercar", "#luxurycars",
   ];
 
-  let videos = (LIB.videos || []).map((v) => ({
-    ...v,
-    type: "short",
-    format: "9:16",
-    markups: v.markups || [],
-    boost: v.boost || 0,
-    viewsTiktok: v.viewsTiktok || 0,
-    viewsInstagram: v.viewsInstagram || 0,
-    likesTiktok: v.likesTiktok || 0,
-    likesInstagram: v.likesInstagram || 0,
-    postedTiktok: !!v.postedTiktok,
-    postedInstagram: !!v.postedInstagram,
-    status: v.status || "pronto",
-    hasLocalFile: !!v.hasLocalFile,
-  }));
+  // Biblioteca comeca VAZIA — usuario adiciona os videos
+  let videos = (LIB.videos || []).map((v) => normalizeVideo(v));
+
+  function normalizeVideo(v) {
+    return {
+      ...v,
+      type: "short",
+      format: "9:16",
+      markups: v.markups || [],
+      boost: v.boost || 0,
+      viewsTiktok: v.viewsTiktok || 0,
+      viewsInstagram: v.viewsInstagram || 0,
+      likesTiktok: v.likesTiktok || 0,
+      likesInstagram: v.likesInstagram || 0,
+      postedTiktok: !!v.postedTiktok,
+      postedInstagram: !!v.postedInstagram,
+      status: v.status || "pronto",
+      hasLocalFile: !!v.hasLocalFile,
+      cover: v.cover || "",
+      coverTitle: v.coverTitle || "",
+      coverPlace: v.coverPlace || "",
+    };
+  }
 
   let state = {
     view: "dashboard",
-    selectedId: videos[0]?.id || 1,
+    selectedId: videos[0]?.id || null,
     filter: "todos",
     query: "",
     tool: "select",
@@ -82,6 +94,7 @@
       instagram: { connected: false, user: "" },
     },
     modalPlatform: null,
+    selectedClipIds: [], // multi-select for auto combine
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -90,32 +103,28 @@
   function load() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const d = JSON.parse(raw);
-      if (d.videos?.length) {
-        const map = Object.fromEntries(d.videos.map((v) => [v.id, v]));
-        videos = videos.map((v) => {
-          const s = map[v.id];
-          if (!s) return v;
-          return {
-            ...v,
-            ...s,
-            cover: v.cover, // keep hosted covers
-            coverTitle: v.coverTitle || s.coverTitle,
-            coverPlace: v.coverPlace || s.coverPlace,
-            hasLocalFile: false, // blobs not persisted
-          };
-        });
-        // add user-created videos without files
-        d.videos.forEach((s) => {
-          if (!videos.find((v) => v.id === s.id)) {
-            videos.push({ ...s, hasLocalFile: false, markups: s.markups || [] });
-          }
-        });
+      if (!raw) {
+        videos = [];
+        projects = [];
+        return;
       }
+      const d = JSON.parse(raw);
+      // apenas videos que o usuario adicionou (sem catalogo embutido)
+      if (Array.isArray(d.videos)) {
+        videos = d.videos.map((s) =>
+          normalizeVideo({ ...s, hasLocalFile: false, demoUrl: s.demoUrl || "" })
+        );
+      } else {
+        videos = [];
+      }
+      if (Array.isArray(d.projects)) projects = d.projects;
       if (d.queue) state.queue = d.queue;
       if (d.accounts) state.accounts = d.accounts;
-    } catch (_) {}
+      if (videos.length) state.selectedId = videos[0].id;
+    } catch (_) {
+      videos = [];
+      projects = [];
+    }
   }
 
   function save() {
@@ -126,7 +135,12 @@
     });
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ videos: light, queue: state.queue, accounts: state.accounts })
+      JSON.stringify({
+        videos: light,
+        projects,
+        queue: state.queue,
+        accounts: state.accounts,
+      })
     );
   }
 
@@ -147,7 +161,7 @@
   }
 
   function selected() {
-    return videos.find((v) => v.id === state.selectedId) || videos[0];
+    return videos.find((v) => v.id === state.selectedId) || videos[0] || null;
   }
 
   function fmt(n) {
@@ -158,7 +172,33 @@
   }
 
   function coverSrc(v) {
-    return asset(v.cover || "covers/car-01-mansao.jpg");
+    // capas separadas: so mostra se usuario atribuiu
+    if (v && v.cover) return asset(v.cover);
+    // placeholder escuro se sem capa
+    return asset("assets/icon-luxecut.jpg");
+  }
+
+  function assignCoverToVideo(videoId, coverFile) {
+    const v = videos.find((x) => x.id === videoId);
+    if (!v) return;
+    const meta = (LIB.coverPool || []).find((c) => c.file === coverFile) || {};
+    v.cover = "covers/" + coverFile;
+    v.coverTitle = meta.title || coverFile;
+    v.coverPlace = meta.place || "";
+    save();
+    renderAll();
+  }
+
+  function clearAllVideos() {
+    videos = [];
+    projects = [];
+    state.selectedId = null;
+    state.queue = [];
+    state.selectedClipIds = [];
+    fileBlobs.clear();
+    save();
+    renderAll();
+    toast("Biblioteca limpa — adicione seus videos");
   }
 
   function mediaSrc(v) {
@@ -422,9 +462,9 @@
         status: "pronto",
         postedTiktok: false,
         postedInstagram: false,
-        cover: "covers/" + (meta.file || "car-01-mansao.jpg"),
-        coverTitle: meta.title || "Luxury car",
-        coverPlace: meta.place || "cenário premium",
+        cover: "",
+        coverTitle: "",
+        coverPlace: "",
         description: "",
         hashtags: [],
         boost: 0,
@@ -437,6 +477,7 @@
       };
       v.description = genViral(v);
       videos.unshift(v);
+      if (!state.selectedId) state.selectedId = v.id;
     });
     // match existing catalog by filename
     files.forEach((f) => {
@@ -486,9 +527,9 @@
       try { loadStudio(); } catch (e) { console.warn(e); }
       setView("dashboard");
       botSay(
-        `Tudo operacional · <strong>${videos.length} vídeos</strong> com demo online · capas 9:16 · Editor Pro · IA · agenda 3/dia.`
+        `<strong>LUXECUT</strong> pronto. Biblioteca <strong>vazia</strong> — importe seus videos. Capas ficam separadas. Use <strong>Auto Mix IA</strong> para juntar clips + musica + edit automatico.`
       );
-      toast("Painel aberto — use Importar ou assista os demos");
+      toast("LUXECUT — adicione seus videos em Importar");
     } catch (err) {
       console.error(err);
       alert("Erro ao abrir painel: " + err.message);
@@ -580,10 +621,159 @@
 
   function renderGrid() {
     const list = filtered();
-    $("#grid").innerHTML = list.length
+    const grid = $("#grid");
+    if (!grid) return;
+    grid.innerHTML = list.length
       ? list.map(cardHTML).join("")
-      : `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Nenhum vídeo</div>`;
-    bindCards($("#grid"));
+      : `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:48px 20px">
+          <div style="font-size:2rem;margin-bottom:8px">LUXECUT</div>
+          <div style="font-size:1.05rem;color:var(--text);margin-bottom:6px">Nenhum video ainda</div>
+          <p>Capas e videos sao separados. Importe seus MP4 em <strong>Importar</strong>.</p>
+          <button class="btn sm" type="button" data-view="import" style="margin-top:12px">Adicionar videos</button>
+        </div>`;
+    bindCards(grid);
+    grid.querySelectorAll("[data-view]").forEach((b) =>
+      b.addEventListener("click", () => setView(b.dataset.view))
+    );
+  }
+
+  function renderProjects() {
+    const box = $("#projectList");
+    if (!box) return;
+    if (!projects.length) {
+      box.innerHTML = `<div style="color:var(--muted);font-size:.9rem;padding:12px">Nenhum pack ainda. Importe videos e clique em <strong>Gerar packs IA</strong>.</div>`;
+      return;
+    }
+    box.innerHTML = projects
+      .map(
+        (p) => `
+      <div class="project-card ${selectedProjectId === p.id ? "on" : ""}" data-pid="${p.id}">
+        <div class="project-top">
+          <img src="${asset(p.cover || "assets/icon-luxecut.jpg")}" alt="" />
+          <div>
+            <h4>${esc(p.name)}</h4>
+            <p>${p.clipCount} clip(s) · ${esc(p.musicName || "sem musica")} · score ${p.score}</p>
+            <p style="margin-top:4px;opacity:.85">${esc((p.clipTitles || []).join(" → "))}</p>
+          </div>
+          <div class="when">${esc(p.style)}</div>
+        </div>
+        <div class="project-notes">${(p.notes || []).map((n) => `<span>${esc(n)}</span>`).join("")}</div>
+        <div class="project-actions">
+          <button class="btn sm" type="button" data-open-proj="${p.id}">Abrir no Editor</button>
+          <button class="btn ghost sm" type="button" data-apply-proj="${p.id}">Aplicar auto-edit</button>
+          <button class="btn ghost sm" type="button" data-del-proj="${p.id}">Remover</button>
+        </div>
+        <pre class="ai-pre" style="max-height:80px">${esc(p.description || "")}</pre>
+      </div>`
+      )
+      .join("");
+
+    box.querySelectorAll("[data-open-proj]").forEach((b) =>
+      b.addEventListener("click", () => openProjectInEditor(b.dataset.openProj))
+    );
+    box.querySelectorAll("[data-apply-proj]").forEach((b) =>
+      b.addEventListener("click", () => applyProjectAuto(b.dataset.applyProj))
+    );
+    box.querySelectorAll("[data-del-proj]").forEach((b) =>
+      b.addEventListener("click", () => {
+        projects = projects.filter((p) => p.id !== b.dataset.delProj);
+        save();
+        renderProjects();
+        toast("Pack removido");
+      })
+    );
+  }
+
+  function runAutoMix(style) {
+    if (!videos.length) {
+      toast("Adicione videos primeiro");
+      setView("import");
+      return;
+    }
+    if (!window.LuxeAuto) {
+      toast("Motor Auto Mix nao carregou");
+      return;
+    }
+    const styleKey = style || $("#autoMixStyle")?.value || "reels";
+    projects = window.LuxeAuto.buildProjects(videos, {
+      style: styleKey,
+      coverPool: LIB.coverPool || [],
+    });
+    // apply cover + music + caption to first clip of each pack (detail)
+    projects.forEach((p) => {
+      p.clipIds.forEach((cid, idx) => {
+        const v = videos.find((x) => x.id === cid);
+        if (!v) return;
+        if (p.cover) {
+          v.cover = p.cover;
+          v.coverTitle = p.coverTitle;
+        }
+        if (idx === 0) {
+          v.description = p.description;
+        }
+        // store music hint on video for editor
+        v._packMusicUrl = p.musicUrl;
+        v._packMusicName = p.musicName;
+        v._packAutoMode = p.autoMode;
+      });
+    });
+    save();
+    renderProjects();
+    renderAll();
+    toast(`${projects.length} pack(s) gerados · ${styleKey}`);
+    botSay(
+      `Auto Mix IA criou <strong>${projects.length}</strong> pack(s) no estilo <code>${esc(styleKey)}</code>. Cada um tem clips combinados, capa separada, musica e legenda curta.`
+    );
+  }
+
+  function applyProjectAuto(pid) {
+    const p = projects.find((x) => x.id === pid);
+    if (!p || !window.VideoFlowEditor) return;
+    p.clipIds.forEach((cid) => {
+      const v = videos.find((x) => x.id === cid);
+      if (!v) return;
+      window.VideoFlowEditor.runAuto(cid, p.autoMode || "reels_pack", v);
+      if (p.musicUrl) {
+        const e = window.VideoFlowEditor.getEdit(cid);
+        e.musicUrl = p.musicUrl;
+        e.musicName = p.musicName;
+        e.muted = true;
+        e.videoVolume = 0;
+      }
+      if (p.cover) {
+        v.cover = p.cover;
+        v.coverTitle = p.coverTitle;
+      }
+      v.description = p.description;
+    });
+    save();
+    toast("Auto-edit aplicado no pack");
+    openProjectInEditor(pid);
+  }
+
+  function openProjectInEditor(pid) {
+    const p = projects.find((x) => x.id === pid);
+    if (!p) return;
+    selectedProjectId = pid;
+    multiClipQueue = p.clipIds.slice();
+    multiClipIndex = 0;
+    state.selectedId = p.clipIds[0];
+    // apply music to first
+    if (window.VideoFlowEditor && p.musicUrl) {
+      const e = window.VideoFlowEditor.getEdit(p.clipIds[0]);
+      e.musicUrl = p.musicUrl;
+      e.musicName = p.musicName;
+      e.muted = true;
+      e.videoVolume = 0;
+    }
+    setView("editor");
+    setTimeout(() => {
+      window.VideoFlowApp?.setSelected(p.clipIds[0]);
+      document.dispatchEvent(
+        new CustomEvent("luxecut-project", { detail: { project: p } })
+      );
+    }, 80);
+    toast("Pack no Editor · clips em sequencia");
   }
 
   function renderTodayQueue() {
@@ -640,29 +830,61 @@
 
   function renderCovers() {
     const pool = LIB.coverPool || [];
-    $("#coverGallery").innerHTML = pool
-      .map(
-        (c) => `
-      <div class="cover-item">
+    const gal = $("#coverGallery");
+    if (gal) {
+      gal.innerHTML = pool
+        .map(
+          (c) => `
+      <div class="cover-item" data-cover-file="${esc(c.file)}">
         <img src="${asset("covers/" + c.file)}" alt="${esc(c.title)}" />
         <div class="ci"><strong>${esc(c.title)}</strong>${esc(c.place)} · 9:16</div>
+        <button class="btn ghost sm cover-assign" type="button" data-cover="${esc(c.file)}" style="margin:8px;width:calc(100% - 16px)">Atribuir ao video selecionado</button>
       </div>`
-      )
-      .join("");
-    $("#coverMap").innerHTML = videos
-      .slice(0, 40)
-      .map(
-        (v) => `
+        )
+        .join("");
+      gal.querySelectorAll("[data-cover]").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (!state.selectedId) {
+            toast("Selecione um video na Biblioteca primeiro");
+            return;
+          }
+          assignCoverToVideo(state.selectedId, btn.dataset.cover);
+          toast("Capa atribuida (separada do video)");
+        });
+      });
+    }
+    const map = $("#coverMap");
+    if (map) {
+      map.innerHTML = videos.length
+        ? videos
+            .map(
+              (v) => `
       <div class="queue-item">
         <img src="${coverSrc(v)}" alt="" />
         <div>
           <h4>${esc(v.title)}</h4>
-          <p>${esc(v.coverTitle)} — ${esc(v.coverPlace)}</p>
+          <p>${v.cover ? esc(v.coverTitle || v.cover) + " — capa atribuida" : "Sem capa — atribua na galeria"}</p>
         </div>
-        <div class="when">9:16</div>
+        <button class="btn ghost sm" type="button" data-clear-cover="${v.id}">Limpar capa</button>
       </div>`
-      )
-      .join("");
+            )
+            .join("")
+        : `<div style="color:var(--muted)">Nenhum video. Capas ficam aqui separadas ate voce importar videos e atribuir.</div>`;
+      map.querySelectorAll("[data-clear-cover]").forEach((b) => {
+        b.addEventListener("click", () => {
+          const v = videos.find((x) => x.id === Number(b.dataset.clearCover));
+          if (v) {
+            v.cover = "";
+            v.coverTitle = "";
+            v.coverPlace = "";
+            save();
+            renderCovers();
+            renderGrid();
+          }
+        });
+      });
+    }
   }
 
   function renderPreview() {
@@ -778,6 +1000,9 @@
     if (state.view === "preview") renderPreview();
     if (state.view === "analytics") renderAnalytics();
     if (state.view === "capas") renderCovers();
+    if (state.view === "automix") renderProjects();
+    const emptyHint = $("#emptyLibHint");
+    if (emptyHint) emptyHint.style.display = videos.length ? "none" : "block";
     save();
   }
 
@@ -954,6 +1179,30 @@
       try {
         loadStudio();
       } catch (_) {}
+    });
+
+    $("#btnAutoMix")?.addEventListener("click", () => {
+      runAutoMix($("#autoMixStyle")?.value || "reels");
+    });
+    $("#btnClearLib")?.addEventListener("click", () => {
+      if (confirm("Remover TODOS os videos da biblioteca?")) clearAllVideos();
+    });
+    $("#btnManualPack")?.addEventListener("click", () => {
+      if (!window.LuxeAuto || !videos.length) return toast("Importe videos primeiro");
+      const ids = state.selectedClipIds.length
+        ? state.selectedClipIds
+        : videos.slice(0, 3).map((v) => v.id);
+      const p = window.LuxeAuto.buildManualProject(
+        videos,
+        ids,
+        $("#autoMixStyle")?.value || "reels"
+      );
+      if (p) {
+        projects.unshift(p);
+        save();
+        renderProjects();
+        toast("Pack manual criado");
+      }
     });
     $("#btnReassignCovers")?.addEventListener("click", reassignCovers);
     $("#btnReassignCovers2")?.addEventListener("click", reassignCovers);
@@ -1190,12 +1439,16 @@
         return v?.demoUrl || null;
       },
       getFileBlobs: () => fileBlobs,
+      getProjects: () => projects,
       save,
       renderAll,
       setView,
       genViral,
       asset,
       enterApp,
+      clearAllVideos,
+      runAutoMix,
+      assignCoverToVideo,
       updateVideo(id, partial) {
         const v = videos.find((x) => x.id === id);
         if (!v) return;
@@ -1209,7 +1462,7 @@
     window.__VF_VIDEO_IDS__ = () => videos.map((v) => v.id);
     window.VideoFlowReady = true;
     document.dispatchEvent(new CustomEvent("vf-ready"));
-    console.info("VideoFlow Pro ready", videos.length, "videos");
+    console.info("LUXECUT ready", videos.length, "videos");
   } catch (err) {
     console.error("VideoFlow boot failed", err);
     const banner = document.createElement("div");
