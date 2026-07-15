@@ -22,6 +22,11 @@ window.LIBRARY = {
                   ],
     "coverPool":  [
                       {
+                          "place":  "Capa oficial do site",
+                          "title":  "LUXECUT",
+                          "file":  "luxecut-brand.jpg"
+                      },
+                      {
                           "place":  "Villa infinity pool",
                           "title":  "Mansao oceanica",
                           "file":  "car-01-mansao.jpg"

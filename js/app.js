@@ -35,7 +35,7 @@
   }
 
   const LIB = window.LIBRARY || { videos: [], coverPool: [], postsPerDay: 3 };
-  const STORAGE_KEY = "luxecut_v1_empty";
+  const STORAGE_KEY = "luxecut_v2_novideos";
   const fileBlobs = new Map(); // id -> objectURL
   let projects = [];
   let selectedProjectId = null;
@@ -174,8 +174,8 @@
   function coverSrc(v) {
     // capas separadas: so mostra se usuario atribuiu
     if (v && v.cover) return asset(v.cover);
-    // placeholder escuro se sem capa
-    return asset("assets/icon-luxecut.jpg");
+    // capa oficial LUXECUT quando nao ha capa no video
+    return asset("covers/luxecut-brand.jpg");
   }
 
   function assignCoverToVideo(videoId, coverFile) {
