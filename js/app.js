@@ -789,7 +789,12 @@
       toast("Motor Auto Mix nao carregou");
       return;
     }
-    const styleKey = style || $("#autoMixStyle")?.value || "reels";
+    const styleKey =
+      style ||
+      $("#autoMixStyle")?.value ||
+      window.LuxeProfile?.loadProfile()?.autoMixStyle ||
+      "reels";
+    if ($("#autoMixStyle")) $("#autoMixStyle").value = styleKey;
     projects = window.LuxeAuto.buildProjects(videos, {
       style: styleKey,
       coverPool: LIB.coverPool || [],
