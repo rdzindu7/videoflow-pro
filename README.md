@@ -8,16 +8,15 @@ Após o deploy: `https://<seu-usuario>.github.io/videoflow-pro/`
 
 ## Funcionalidades
 
-- Biblioteca de vídeos (catálogo + importação local de MP4)
-- Capas automáticas **9:16** (carros em lugares ultra-ricos)
-- Geração de legendas virais e hashtags
-- Agenda automática **3 vídeos por dia** (11:00 · 15:30 · 20:00)
-- Anti re-post (não publica de novo o que já saiu)
-- Conexão de contas TikTok e Instagram (fluxo de permissões)
-- Preview estilo tela real TikTok / Instagram Reels
-- Estúdio com marcações + chat IA
-- Analytics e **boost** de views
-- Dados salvos no `localStorage` do navegador
+- **Editor Pro**: play/pause, timeline, fullscreen, filtros, velocidade
+- **Áudio**: silenciar um ou **todos** os vídeos, importar música, volumes separados
+- **Export 9:16**: Full HD 1080p · QHD · **4K** · **8K** (projeto JSON de render)
+- **Ver vídeos**: importe MP4 e assista no player vertical
+- **IA de descrições**: motor com score de viralidade (viral / luxury / story / CTA)
+- **IA de edição**: presets cinematic, night, slow-mo, punchy + sugestões
+- Capas automáticas **9:16** luxury cars
+- Agenda **3 posts/dia** TikTok + Instagram · anti re-post
+- Preview real TT/Reels · boost de views · localStorage
 
 ## Como usar
 

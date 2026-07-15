@@ -39,7 +39,7 @@
           <button class="btn ghost" data-view-later="import">Importar meus vídeos</button>
         </div>
         <p style="margin-top:16px;font-size:.82rem;color:var(--muted)">
-          63 vídeos catalogados · 12 capas 9:16 · anti-duplicata · chat IA de edição
+          Editor Pro · mute/música · Full HD–8K · IA de legendas · 12 capas 9:16
         </p>
       </div>
       <div class="hero-card">
@@ -95,7 +95,8 @@
         <button class="tab" data-view="biblioteca">Biblioteca</button>
         <button class="tab" data-view="capas">Capas</button>
         <button class="tab" data-view="preview">Preview</button>
-        <button class="tab" data-view="estudio">Estúdio + IA</button>
+        <button class="tab" data-view="editor">Editor Pro + IA</button>
+        <button class="tab" data-view="estudio">Estúdio</button>
         <button class="tab" data-view="agenda">Agenda 3/dia</button>
         <button class="tab" data-view="analytics">Views</button>
         <button class="tab" data-view="contas">Contas</button>
@@ -116,7 +117,8 @@
         <button class="nav" data-view="capas">🖼 Capas 9:16</button>
         <button class="nav" data-view="preview">📱 Preview real</button>
         <div class="side-label">Criação</div>
-        <button class="nav" data-view="estudio">✦ Estúdio + IA</button>
+        <button class="nav" data-view="editor">🎛 Editor Pro + IA</button>
+        <button class="nav" data-view="estudio">✦ Estúdio</button>
         <div class="side-label">Publicação</div>
         <button class="nav" data-view="agenda">📅 Agenda <span class="c" id="cQ">0</span></button>
         <button class="nav" data-view="analytics">📈 Views & Boost</button>
@@ -236,6 +238,130 @@
             <div class="panel-b">
               <div class="desc" id="previewDesc"></div>
               <div class="hashes" id="previewHash" style="margin-top:10px"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EDITOR PRO -->
+        <section class="view" id="view-editor">
+          <div class="head">
+            <div>
+              <h2>Editor Pro · vídeo + áudio + IA</h2>
+              <p>Assistir · silenciar · música · filtros · Full HD / 4K / 8K · melhores descrições</p>
+            </div>
+            <select id="editorSelect" style="background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:220px"></select>
+          </div>
+          <div class="editor-layout">
+            <div class="panel ed-stage-wrap">
+              <div class="ed-stage" id="edStage">
+                <div class="ed-frame">
+                  <img id="edCover" alt="capa" />
+                  <video id="edPlayer" playsinline preload="metadata"></video>
+                  <div class="ed-text-overlay" id="edTextOverlay"></div>
+                </div>
+              </div>
+              <audio id="edMusic" preload="auto"></audio>
+              <div class="ed-transport">
+                <button class="btn sm" id="edPlay">▶ Play</button>
+                <button class="btn ghost sm" id="edPause">⏸</button>
+                <button class="btn ghost sm" id="edStop">⏹</button>
+                <input type="range" class="seek" id="edSeek" min="0" max="100" value="0" step="0.01" />
+                <span class="ed-time" id="edTime">0:00 / 0:00</span>
+                <button class="btn ghost sm" id="edFullscreen">⛶</button>
+              </div>
+              <div class="ed-panels">
+                <div class="ed-meta" id="edMeta">Selecione um vídeo e importe o arquivo para assistir.</div>
+                <div class="ed-flags">
+                  <label><input type="checkbox" id="edMute" /> Silenciar este vídeo</label>
+                  <label><input type="checkbox" id="edLoop" checked /> Loop</label>
+                  <button class="btn danger sm" id="edMuteAll">Silenciar TODOS</button>
+                  <button class="btn ghost sm" id="edUnmuteAll">Restaurar som</button>
+                </div>
+                <div class="ed-section-title">Volumes</div>
+                <div class="slider-row"><span>Vídeo</span><input type="range" id="edVolVideo" min="0" max="1" step="0.01" value="1" /><span id="edVolVideoVal">100%</span></div>
+                <div class="slider-row"><span>Música</span><input type="range" id="edVolMusic" min="0" max="1" step="0.01" value="0.32" /><span>32%</span></div>
+                <div class="ed-section-title">Trilha / música</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                  <label class="btn ghost sm" style="cursor:pointer">+ Música<input type="file" id="edMusicFile" accept="audio/*,.mp3,.wav,.m4a,.aac" hidden /></label>
+                  <button class="btn ghost sm" id="edMusicClear">Remover</button>
+                  <span id="edMusicName" style="font-size:.78rem;color:var(--muted)">Nenhuma trilha</span>
+                </div>
+                <div class="ed-section-title">Velocidade & look</div>
+                <div class="slider-row"><span>Speed</span><input type="range" id="edSpeed" min="0.25" max="2" step="0.05" value="1" /><span id="edSpeedVal">1.00x</span></div>
+                <div class="slider-row"><span>Bright</span><input type="range" id="edBright" min="0.5" max="1.5" step="0.01" value="1" /><span></span></div>
+                <div class="slider-row"><span>Contrast</span><input type="range" id="edContrast" min="0.5" max="1.8" step="0.01" value="1" /><span></span></div>
+                <div class="slider-row"><span>Saturação</span><input type="range" id="edSaturate" min="0" max="2" step="0.01" value="1" /><span></span></div>
+                <div class="field" style="margin-top:8px">
+                  <label>Preset IA de cor</label>
+                  <select id="edPreset">
+                    <option value="raw">Raw / Natural</option>
+                    <option value="cinematic">Cinematic Luxury</option>
+                    <option value="night">Night Drive</option>
+                    <option value="soft">Soft Aesthetic</option>
+                    <option value="slowmo">Slow Motion Flex</option>
+                    <option value="punchy">Punchy Viral</option>
+                  </select>
+                </div>
+                <div class="ed-section-title">Exportação 9:16</div>
+                <div class="field">
+                  <label>Resolução de saída</label>
+                  <select id="edRes">
+                    <option value="fhd">Full HD — 1080×1920</option>
+                    <option value="qhd">QHD — 1440×2560</option>
+                    <option value="4k">4K UHD — 2160×3840</option>
+                    <option value="8k">8K — 4320×7680</option>
+                  </select>
+                </div>
+                <div id="edResInfo" style="font-size:.78rem;color:var(--gold2);margin-bottom:8px">Full HD · 1080×1920 · 9:16</div>
+                <div class="field"><label>Texto na tela</label><input id="edText" placeholder="LUXURY · DREAM CAR" /></div>
+                <div class="slider-row"><span>Tam. texto</span><input type="range" id="edTextSize" min="14" max="56" value="28" /><span></span></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                  <button class="btn sm" id="edExportJson">Baixar projeto JSON</button>
+                  <button class="btn ghost sm" id="btnEdImportHint">Precisa importar MP4</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel" style="display:flex;flex-direction:column;min-height:0">
+              <div class="panel-h"><h3>✦ IA — melhores descrições</h3></div>
+              <div class="panel-b" style="overflow:auto;flex:1">
+                <p style="margin:0 0 10px;color:var(--muted);font-size:.82rem;line-height:1.4">
+                  Motor de copy com score de viralidade. Escolha o estilo ou pece a melhor.
+                </p>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+                  <button class="btn sm" id="aiBestCap">Melhor legenda</button>
+                  <button class="btn ghost sm" id="aiViral">Viral</button>
+                  <button class="btn ghost sm" id="aiLuxury">Luxury</button>
+                  <button class="btn ghost sm" id="aiStory">Story</button>
+                  <button class="btn ghost sm" id="aiAllCaps">4 opções</button>
+                </div>
+                <div class="cap-cards" id="aiCapCards"></div>
+                <div class="field" style="margin-top:12px">
+                  <label>Descrição ativa</label>
+                  <div class="desc" id="aiDescActive" contenteditable="true"></div>
+                </div>
+                <button class="btn sm" id="aiApplyDesc" style="width:100%">Aplicar legenda ao vídeo</button>
+              </div>
+            </div>
+
+            <div class="panel chat" style="max-height:none">
+              <div class="chat-h">
+                <h3>✦ IA de edição</h3>
+                <p>Mute, música, 4K/8K, presets, sugestões…</p>
+              </div>
+              <div class="chat-msgs" id="edChatMsgs"></div>
+              <div class="sugs">
+                <button class="sug ed-sug">Gera a melhor legenda</button>
+                <button class="sug ed-sug">Silencia todos os vídeos</button>
+                <button class="sug ed-sug">Preset cinematic</button>
+                <button class="sug ed-sug">Exporta em 4K</button>
+                <button class="sug ed-sug">Exporta em 8K</button>
+                <button class="sug ed-sug">Sugestões de edição</button>
+              </div>
+              <div class="chat-in">
+                <textarea id="edChatInput" rows="2" placeholder="Ex: silencia, adiciona vibe luxury e melhor legenda..."></textarea>
+                <button class="btn" id="edChatSend">Enviar</button>
+              </div>
             </div>
           </div>
         </section>
@@ -409,7 +535,10 @@
   <div class="toast" id="toast"></div>
 
   <script src="data/library.js"></script>
+  <script src="js/ai-engine.js"></script>
+  <script src="js/editor.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/editor-bridge.js"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", () => {
       document.getElementById("btnEnter").click();

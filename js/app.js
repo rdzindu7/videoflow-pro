@@ -138,6 +138,11 @@
   }
 
   function genViral(v) {
+    if (window.VideoFlowAI?.bestDescription) {
+      try {
+        return window.VideoFlowAI.bestDescription(v).text;
+      } catch (_) {}
+    }
     const hook = VIRAL_HOOKS[v.id % VIRAL_HOOKS.length];
     const place = v.coverPlace || "cenário de ultra luxo";
     const tags = pickTags(v);
@@ -1078,4 +1083,29 @@ ${tags.join(" ")}`;
       heroImg.src = "covers/" + LIB.coverPool[i].file;
     }, 3200);
   }
+
+  // public API for editor / AI bridge
+  window.VideoFlowApp = {
+    getVideos: () => videos,
+    getSelected: () => selected(),
+    setSelected: (id) => {
+      state.selectedId = id;
+      renderAll();
+    },
+    getBlobUrl: (id) => fileBlobs.get(id) || null,
+    getFileBlobs: () => fileBlobs,
+    save,
+    renderAll,
+    setView,
+    genViral,
+    updateVideo(id, partial) {
+      const v = videos.find((x) => x.id === id);
+      if (!v) return;
+      Object.assign(v, partial);
+      save();
+      renderAll();
+    },
+    getState: () => state,
+  };
+  window.__VF_VIDEO_IDS__ = () => videos.map((v) => v.id);
 })();
