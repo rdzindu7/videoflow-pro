@@ -3,45 +3,41 @@
  * Motor local avançado (sem API key) com templates, scoring e estilos.
  */
 window.VideoFlowAI = (function () {
+  // Legendas CURTAS — foco em seguir, sem detalhes do video, max 5 #
   const HOOKS = {
     viral: [
-      "Isso aqui é outro nível 🔥🏎️",
-      "Para o scroll. Agora. 👀",
-      "POV: o carro e o cenário dos sonhos 🖤",
-      "Se você sentiu o chill… comenta 🔥",
-      "Salva antes do algoritmo esconder 💎",
-      "Não é flex. É padrão. 🥂",
-      "Som do motor > qualquer trend 🎵",
-      "Lugares caros. Carros mais caros. 🏎️",
+      "Isso aqui e so o comeco 🔥",
+      "Se gostou, fica 👀",
+      "Voce ainda nao viu nada 🖤",
+      "O feed vai mudar ✨",
+      "Nao pisca 🏎️",
+      "Isso e padrao 💎",
     ],
     luxury: [
-      "Silêncio. Presença. Poder. ✨",
-      "Onde o luxo estaciona 🖤",
-      "Detalhe por detalhe — zero pressa.",
-      "Estética de colecionador. 🥂",
-      "Night drive. Private view. 🌙",
+      "Silencio. Presenca. ✨",
+      "Luxo sem gritar 🖤",
+      "Sua nova fixacao 🥂",
+      "Fica. Vale a pena 🌙",
     ],
     story: [
-      "Tudo começou com esse frame…",
-      "A história por trás da máquina 📖",
-      "Do sonho à estrada — sem filtro.",
-      "Um dia na vida com esse carro.",
+      "Tem mais vindo 🔥",
+      "Parte 1 de muitas 👀",
+      "Voce vai querer a proxima 🖤",
     ],
     cta: [
-      "Comenta GARAGEM pra parte 2 💬",
-      "Qual você levaria? Responde 👇",
-      "Segue pra mais carros em lugares absurdos",
-      "Ativa o som 🔊 e assiste até o final",
-      "Salva + compartilha com quem ama carros",
+      "Segue pra nao perder 💬",
+      "Segue se e teu estilo 👇",
+      "Ativa o sininho 🔔",
+      "Entra pro clube ✨",
     ],
   };
 
   const TAG_POOLS = {
-    core: ["#fyp", "#foryou", "#foryoupage", "#viral", "#trending", "#reels", "#instareels"],
-    cars: ["#supercar", "#luxurycars", "#carsoftiktok", "#exoticcars", "#hypercar", "#dreamcar", "#carporn", "#automotive"],
-    luxury: ["#richlife", "#luxurylifestyle", "#wealth", "#millionairelifestyle", "#aesthetic"],
-    br: ["#brasil", "#carsbr", "#luxobrasil", "#tiktokbrasil"],
-    niche: ["#night drive", "#garagegoals", "#cargram", "#supercarsdaily", "#luxurycar"],
+    core: ["#fyp", "#foryou", "#viral", "#reels", "#foryoupage"],
+    cars: ["#supercar", "#luxurycars", "#carsoftiktok", "#dreamcar", "#exoticcars"],
+    luxury: ["#richlife", "#luxurylifestyle", "#aesthetic", "#wealth"],
+    br: ["#brasil", "#tiktokbrasil"],
+    niche: ["#garagegoals", "#cargram"],
   };
 
   const EDIT_PRESETS = {
@@ -113,61 +109,54 @@ window.VideoFlowAI = (function () {
   }
 
   function scoreCaption(text) {
-    let s = 50;
-    if (text.length >= 80 && text.length <= 400) s += 15;
-    if (/[🔥💎✨🖤🏎️👀]/.test(text)) s += 10;
-    if (/#\w+/.test(text)) s += 10;
-    if ((text.match(/#/g) || []).length >= 5 && (text.match(/#/g) || []).length <= 12) s += 10;
-    if (/comenta|salva|segue|ativa/i.test(text)) s += 10;
-    if (text.split("\n").length >= 3) s += 5;
-    return Math.min(99, s);
+    let s = 55;
+    const len = text.replace(/#\w+/g, "").trim().length;
+    // prefer SHORT captions
+    if (len <= 90) s += 20;
+    else if (len <= 140) s += 10;
+    else s -= 15;
+    const hashCount = (text.match(/#/g) || []).length;
+    if (hashCount > 0 && hashCount <= 5) s += 15;
+    if (hashCount > 5) s -= 25;
+    if (/segue|follow|fica|sininho|clube/i.test(text)) s += 12;
+    if (/[🔥💎✨🖤🏎️👀]/i.test(text)) s += 5;
+    // penalize long detail dumps
+    if (text.split("\n").length > 4) s -= 10;
+    return Math.min(99, Math.max(1, s));
   }
 
+  /** Max 5 hashtags — never more */
   function buildHashtags(video, style) {
-    const seed = hashSeed(video.id + (video.title || "") + style);
-    const tags = new Set();
+    const seed = hashSeed(String(video.id || 0) + style + "h5");
     const pools = [
       ...TAG_POOLS.core,
       ...TAG_POOLS.cars,
-      ...TAG_POOLS.luxury,
-      ...(style === "viral" ? TAG_POOLS.br : []),
-      ...TAG_POOLS.niche,
+      ...(style === "luxury" ? TAG_POOLS.luxury : TAG_POOLS.cars),
+      ...TAG_POOLS.br,
     ];
-    // custom from title words
-    String(video.title || "")
-      .toLowerCase()
-      .split(/[^a-z0-9à-ú]+/i)
-      .filter((w) => w.length > 3)
-      .slice(0, 3)
-      .forEach((w) => tags.add("#" + w.replace(/\s/g, "")));
-
-    for (let i = 0; i < 14 && tags.size < 12; i++) {
-      tags.add(pick(pools, seed, i * 3));
+    const tags = [];
+    for (let i = 0; tags.length < 5 && i < 20; i++) {
+      const t = pick(pools, seed, i * 2);
+      if (t && !tags.includes(t)) tags.push(t);
     }
-    return [...tags].slice(0, 11);
+    return tags.slice(0, 5);
   }
 
+  /**
+   * Legenda CURTA:
+   * - sem detalhes do video (sem titulo/lugar/specs)
+   * - foco em interesse + seguir
+   * - no maximo 5 hashtags
+   */
   function generateDescription(video, style = "viral") {
-    const seed = hashSeed((video.id || 0) + (video.title || "") + style + (video.coverPlace || ""));
-    const place = video.coverPlace || "cenário de ultra luxo";
-    const title = video.title || "Luxury car clip";
+    const seed = hashSeed((video.id || 0) + style + "short");
     const hookPool = HOOKS[style] || HOOKS.viral;
     const hook = pick(hookPool, seed, 1);
-    const cta = pick(HOOKS.cta, seed, 2);
+    const cta = pick(HOOKS.cta, seed, 3);
     const tags = buildHashtags(video, style);
 
-    let body = "";
-    if (style === "luxury") {
-      body = `${title}.\n${place}.\nPresença impecável. Zero pressa. Só presença.`;
-    } else if (style === "story") {
-      body = `${title}\n\nNesse frame: ${place}.\nCada detalhe conta a história da máquina.`;
-    } else if (style === "cta") {
-      body = `${title} · ${place}\n\nAssiste até o final e me diz: você ficaria com esse?`;
-    } else {
-      body = `${title} · ${place}\n\nAlta resolução · 9:16 · som limpo.`;
-    }
-
-    const text = `${hook}\n\n${body}\n\n${cta}\n\n${tags.join(" ")}`;
+    // 2 linhas curtas + hashtags (sem body de detalhes)
+    const text = `${hook}\n${cta}\n\n${tags.join(" ")}`;
     return {
       text,
       style,
@@ -176,10 +165,9 @@ window.VideoFlowAI = (function () {
       hook,
       cta,
       tips: [
-        "Poste nos horários 11:00, 15:30 ou 20:00",
-        "Primeiros 1s precisam do carro em destaque",
-        "CTA no final aumenta comentários",
-        style === "viral" ? "Use áudio trending se possível" : "Mantenha estética clean de luxo",
+        "Max 5 hashtags",
+        "Sem spoiler do video — so curiosidade",
+        "CTA de seguir sempre",
       ],
     };
   }

@@ -38,22 +38,19 @@
   const STORAGE_KEY = "vf_pro_cloud_v2";
   const fileBlobs = new Map(); // id -> objectURL
 
+  // Legendas curtas: curiosidade + seguir, max 5 #, sem detalhes do video
   const VIRAL_HOOKS = [
-    "Isso aqui é outro nível 🔥🏎️",
-    "POV: o carro e o cenário dos sonhos 🖤",
-    "Para o scroll. Agora. 👀",
-    "Luxo silencioso. O motor fala. ✨",
-    "Salva antes do algoritmo esconder 💎",
-    "Qual você levaria pra casa? 👇",
-    "Não é flex. É padrão. 🥂",
-    "Som do motor > qualquer trend 🎵",
-    "Lugares caros. Carros mais caros. 🏎️",
-    "Se você sentiu o chill… comenta 🔥",
+    "Isso aqui e so o comeco 🔥",
+    "Se gostou, fica 👀",
+    "Voce ainda nao viu nada 🖤",
+    "O feed vai mudar ✨",
+    "Nao pisca 🏎️",
+    "Isso e padrao 💎",
+    "Sua nova fixacao 🥂",
+    "Tem mais vindo 🔥",
   ];
   const VIRAL_TAGS = [
-    "#fyp", "#foryou", "#foryoupage", "#viral", "#supercar", "#luxurycars",
-    "#carsoftiktok", "#exoticcars", "#richlife", "#dreamcar", "#reels",
-    "#instareels", "#carporn", "#hypercar", "#luxurylifestyle", "#trending",
+    "#fyp", "#foryou", "#viral", "#supercar", "#luxurycars",
   ];
 
   let videos = (LIB.videos || []).map((v) => ({
@@ -181,25 +178,24 @@
       } catch (_) {}
     }
     const hook = VIRAL_HOOKS[v.id % VIRAL_HOOKS.length];
-    const place = v.coverPlace || "cenário de ultra luxo";
+    const ctas = [
+      "Segue pra nao perder 💬",
+      "Segue se e teu estilo 👇",
+      "Ativa o sininho 🔔",
+      "Entra pro clube ✨",
+    ];
+    const cta = ctas[v.id % ctas.length];
     const tags = pickTags(v);
-    return `${hook}
-
-${v.title} · ${place}
-
-Comenta GARAGEM se quiser a parte 2 💬
-Segue pra mais carros em lugares absurdos.
-Ativa o som 🔊
-
-${tags.join(" ")}`;
+    // curta: hook + CTA + max 5 #
+    return `${hook}\n${cta}\n\n${tags.join(" ")}`;
   }
 
   function pickTags(v) {
     const base = [...VIRAL_TAGS];
     const start = (v.id * 3) % base.length;
     const set = [];
-    for (let i = 0; i < 12; i++) set.push(base[(start + i) % base.length]);
-    return [...new Set(set)].slice(0, 11);
+    for (let i = 0; i < 5; i++) set.push(base[(start + i) % base.length]);
+    return [...new Set(set)].slice(0, 5);
   }
 
   function extractHash(text) {
