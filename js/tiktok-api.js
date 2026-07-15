@@ -34,7 +34,13 @@ window.TikTokAPI = (function () {
 
   function bearer() {
     const t = loadCfg().accessToken;
-    if (!t) throw new Error("Cole o Access Token TikTok (Bearer) em Contas → API TikTok");
+    if (!t) {
+      const err = new Error(
+        "Falta Access Token. Abra Contas → cole o token OU clique em OAuth Login TikTok (Client Key+Secret salvos)."
+      );
+      err.code = "NO_TOKEN";
+      throw err;
+    }
     return t.startsWith("Bearer ") ? t : `Bearer ${t}`;
   }
 

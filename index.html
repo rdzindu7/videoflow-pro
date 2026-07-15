@@ -645,8 +645,12 @@
                 <button class="btn ghost sm" type="button" id="ttTestStatus">Testar status API</button>
               </div>
               <div class="note" style="margin-top:10px">
-                Automatico preenche: Client Key do seu app, Redirect URI do LUXECUT, privacidade PUBLIC.
-                Client Secret voce cola 1 vez (nao vai pro GitHub). Depois OAuth gera o Access Token.
+                <strong>Access Token</strong> nao e a Client Key. E o token depois do login OAuth (comeca com act. ou similar).
+                <br/>1) Client Key ja vem automatico
+                <br/>2) Cole Client Secret
+                <br/>3) Clique <strong>OAuth Login TikTok</strong> (gera o Access Token)
+                <br/>4) Ou cole o token manualmente no campo Access Token e Salvar
+                <br/>Redirect URI no portal TikTok deve ser: <code>https://rdzindu7.github.io/videoflow-pro/</code>
               </div>
               <div class="note" id="ttApiLog" style="margin-top:12px;max-height:160px;overflow:auto;white-space:pre-wrap">Log da API aparece aqui.
 Endpoints:
@@ -705,10 +709,10 @@ POST /v2/post/publish/creator_info/query/</div>
   <script src="js/ai-engine.js?v=niche1"></script>
   <script src="js/auto-combine.js?v=niche1"></script>
   <script src="js/editor.js?v=niche1"></script>
-  <script src="js/tiktok-api.js?v=niche1"></script>
+  <script src="js/tiktok-api.js?v=token1"></script>
   <script src="js/app.js?v=niche1"></script>
   <script src="js/editor-bridge.js?v=niche1"></script>
-  <script src="js/tiktok-bridge.js?v=niche1"></script>
+  <script src="js/tiktok-bridge.js?v=token1"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", function () {
       document.getElementById("btnEnter")?.click();

@@ -192,10 +192,35 @@
     fillForm();
   }
 
+  function needTokenHelp(err) {
+    const msg = String(err?.message || err || "");
+    log("ERRO: " + msg);
+    toast(msg);
+    // abre Contas e destaca token
+    try {
+      window.VideoFlowApp?.setView?.("contas");
+      setTimeout(() => {
+        const el = $("#ttAccessToken");
+        if (el) {
+          el.focus();
+          el.style.outline = "2px solid #c9a227";
+          setTimeout(() => (el.style.outline = ""), 4000);
+        }
+      }, 200);
+    } catch (_) {}
+  }
+
   async function creatorInfo() {
     const TT = window.TikTokAPI;
     try {
       saveKeys();
+      if (!TT.loadCfg().accessToken) {
+        needTokenHelp({
+          message:
+            "Falta Access Token. 1) Salve Client Key+Secret  2) OAuth Login TikTok  OU cole o token Bearer em Access Token",
+        });
+        return;
+      }
       log("POST /v2/post/publish/creator_info/query/ ...");
       const res = await TT.queryCreatorInfo();
       const d = res.data || {};
@@ -231,18 +256,24 @@
       }
       toast("creator_info OK");
     } catch (e) {
-      log("ERRO: " + e.message);
-      toast(e.message);
+      needTokenHelp(e);
     }
   }
 
   async function publishSelected() {
     const TT = window.TikTokAPI;
     const A = window.VideoFlowApp;
-    if (!A) return toast("App não carregou");
+    if (!A) return toast("App nao carregou");
     saveKeys();
+    if (!TT.loadCfg().accessToken) {
+      needTokenHelp({
+        message:
+          "Falta Access Token para publicar. Contas → OAuth Login TikTok (ou cole o Bearer token).",
+      });
+      return;
+    }
     const v = A.getSelected();
-    if (!v) return toast("Selecione um vídeo");
+    if (!v) return toast("Selecione um video");
     const title = (v.description || v.title || "VideoFlow").slice(0, 2200);
     const privacy = $("#ttPrivacy")?.value || "PUBLIC_TO_EVERYONE";
     const blobUrl = A.getBlobUrl(v.id);
@@ -293,8 +324,7 @@
 
       await doUpload(file, title, privacy, v);
     } catch (e) {
-      log("ERRO publish: " + e.message);
-      toast(e.message);
+      needTokenHelp(e);
     }
   }
 
