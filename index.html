@@ -506,29 +506,66 @@
         <section class="view" id="view-contas">
           <div class="head">
             <div>
-              <h2>Contas TikTok + Instagram</h2>
-              <p>PermissÃµes de publicaÃ§Ã£o e insights</p>
+              <h2>Contas + API TikTok real</h2>
+              <p>Content Posting API · init · upload · status · creator_info</p>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:14px">
+            <div class="panel-h"><h3>TikTok Content Posting API (keys)</h3>
+              <a class="btn ghost sm" href="https://developers.tiktok.com/apps/" target="_blank" rel="noopener">Abrir TikTok Apps</a>
+            </div>
+            <div class="panel-b">
+              <div class="ed-grid-2">
+                <div class="field"><label>Client Key</label><input id="ttClientKey" placeholder="awxxxxx" autocomplete="off" /></div>
+                <div class="field"><label>Client Secret</label><input id="ttClientSecret" type="password" placeholder="secret" autocomplete="off" /></div>
+                <div class="field"><label>Access Token (Bearer)</label><input id="ttAccessToken" placeholder="act.xxxxx ou token OAuth" autocomplete="off" /></div>
+                <div class="field"><label>Proxy URL (Cloudflare Worker) — evita CORS</label><input id="ttProxyUrl" placeholder="https://seu-worker.workers.dev" /></div>
+              </div>
+              <div class="field"><label>Redirect URI (cole igual no app TikTok)</label><input id="ttRedirect" readonly /></div>
+              <div class="field">
+                <label>Privacidade padrao</label>
+                <select id="ttPrivacy">
+                  <option value="PUBLIC_TO_EVERYONE">PUBLIC_TO_EVERYONE</option>
+                  <option value="MUTUAL_FOLLOW_FRIENDS">MUTUAL_FOLLOW_FRIENDS</option>
+                  <option value="SELF_ONLY">SELF_ONLY</option>
+                </select>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+                <button class="btn sm" id="ttSaveKeys">Salvar keys</button>
+                <button class="btn tiktok sm" id="ttOAuth">OAuth Login TikTok</button>
+                <button class="btn ghost sm" id="ttCreatorInfo">Query creator_info</button>
+                <button class="btn sm" id="ttPublishSelected">Publicar video selecionado (API real)</button>
+                <button class="btn ghost sm" id="ttTestStatus">Testar status API</button>
+              </div>
+              <div class="note" id="ttApiLog" style="margin-top:12px;max-height:160px;overflow:auto;white-space:pre-wrap">
+Log da API aparece aqui.
+Endpoints:
+POST /v2/post/publish/video/init/
+PUT upload_url (FILE_UPLOAD)
+POST /v2/post/publish/status/fetch/
+POST /v2/post/publish/creator_info/query/
+              </div>
             </div>
           </div>
           <div class="split">
             <div class="hero-box">
-              <h3>â™ª TikTok</h3>
-              <p>video.publish Â· user.info Â· video.list Â· insights</p>
+              <h3>TikTok conta</h3>
+              <p id="ttAccountLabel">Desconectado · salve o Access Token ou use OAuth</p>
               <div class="perms">
-                <div class="perm"><span class="check">âœ“</span><div>Publicar vÃ­deos</div></div>
-                <div class="perm"><span class="check">âœ“</span><div>Ler perfil e @</div></div>
-                <div class="perm"><span class="check">âœ“</span><div>Evitar duplicatas</div></div>
+                <div class="perm"><span class="check">✓</span><div>video.publish / video.upload</div></div>
+                <div class="perm"><span class="check">✓</span><div>user.info.basic</div></div>
+                <div class="perm"><span class="check">✓</span><div>Content Posting API</div></div>
               </div>
-              <button class="btn tiktok" id="btnConnTT">Conectar TikTok</button>
+              <button class="btn tiktok" id="btnConnTT">Marcar conectado (@)</button>
               <button class="btn ghost sm" id="btnDiscTT" style="margin-left:8px">Desconectar</button>
             </div>
             <div class="hero-box ig">
-              <h3>ðŸ“· Instagram</h3>
-              <p>content_publish Â· basic Â· manage_insights</p>
+              <h3>Instagram (Meta)</h3>
+              <p>content_publish · basic · manage_insights</p>
               <div class="perms">
-                <div class="perm"><span class="check">âœ“</span><div>Publicar Reels</div></div>
-                <div class="perm"><span class="check">âœ“</span><div>Legendas e hashtags</div></div>
-                <div class="perm"><span class="check">âœ“</span><div>Views e alcance</div></div>
+                <div class="perm"><span class="check">✓</span><div>Publicar Reels</div></div>
+                <div class="perm"><span class="check">✓</span><div>Legendas e hashtags</div></div>
+                <div class="perm"><span class="check">✓</span><div>Views e alcance</div></div>
               </div>
               <button class="btn ig" id="btnConnIG">Conectar Instagram</button>
               <button class="btn ghost sm" id="btnDiscIG" style="margin-left:8px">Desconectar</button>
@@ -555,8 +592,10 @@
   <script src="data/library.js"></script>
   <script src="js/ai-engine.js"></script>
   <script src="js/editor.js"></script>
+  <script src="js/tiktok-api.js"></script>
   <script src="js/app.js"></script>
   <script src="js/editor-bridge.js"></script>
+  <script src="js/tiktok-bridge.js"></script>
   <script>
     document.getElementById("btnEnter2")?.addEventListener("click", () => {
       document.getElementById("btnEnter").click();
