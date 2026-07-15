@@ -35,7 +35,7 @@
   }
 
   const LIB = window.LIBRARY || { videos: [], coverPool: [], postsPerDay: 3 };
-  const STORAGE_KEY = "vf_pro_cloud_v2";
+  const STORAGE_KEY = "vf_pro_cloud_v3_shortcap";
   const fileBlobs = new Map(); // id -> objectURL
 
   // Legendas curtas: curiosidade + seguir, max 5 #, sem detalhes do video
@@ -171,22 +171,36 @@
     return fileBlobs.has(v.id) || !!v.demoUrl;
   }
 
+  function isOldLongCaption(text) {
+    if (!text) return true;
+    const hashes = (text.match(/#/g) || []).length;
+    if (hashes > 5) return true;
+    if (/Alta resolu|9:16|som limpo|Comenta GARAGEM|Clip \d|· |coverPlace|Pôr do sol|porto/i.test(text))
+      return true;
+    if (text.length > 160) return true;
+    return false;
+  }
+
   function genViral(v) {
     if (window.VideoFlowAI?.bestDescription) {
       try {
-        return window.VideoFlowAI.bestDescription(v).text;
+        const t = window.VideoFlowAI.bestDescription(v).text;
+        if (t && !isOldLongCaption(t)) return t;
+        if (window.VideoFlowAI.generateDescription) {
+          return window.VideoFlowAI.generateDescription(v, "viral").text;
+        }
       } catch (_) {}
     }
     const hook = VIRAL_HOOKS[v.id % VIRAL_HOOKS.length];
     const ctas = [
-      "Segue pra nao perder 💬",
-      "Segue se e teu estilo 👇",
-      "Ativa o sininho 🔔",
-      "Entra pro clube ✨",
+      "Segue pra nao perder",
+      "Segue se e teu estilo",
+      "Ativa o sininho",
+      "Entra pro clube",
     ];
     const cta = ctas[v.id % ctas.length];
     const tags = pickTags(v);
-    // curta: hook + CTA + max 5 #
+    // curta: hook + CTA + max 5 #  — SEM detalhes do video
     return `${hook}\n${cta}\n\n${tags.join(" ")}`;
   }
 
@@ -196,6 +210,13 @@
     const set = [];
     for (let i = 0; i < 5; i++) set.push(base[(start + i) % base.length]);
     return [...new Set(set)].slice(0, 5);
+  }
+
+  function forceShortCaptionsAll() {
+    videos.forEach((v) => {
+      v.description = genViral(v);
+    });
+    save();
   }
 
   function extractHash(text) {
@@ -927,12 +948,12 @@
     $("#btnAutoDay2")?.addEventListener("click", () => scheduleDays(7));
     $("#btnProcess")?.addEventListener("click", processQueue);
     $("#btnRegenAll")?.addEventListener("click", () => {
-      videos.forEach((v) => {
-        v.description = genViral(v);
-      });
-      save();
-      toast("Legendas regeneradas");
+      forceShortCaptionsAll();
+      toast("Legendas curtas: max 5 #, foco em seguir");
       renderAll();
+      try {
+        loadStudio();
+      } catch (_) {}
     });
     $("#btnReassignCovers")?.addEventListener("click", reassignCovers);
     $("#btnReassignCovers2")?.addEventListener("click", reassignCovers);
@@ -1134,8 +1155,13 @@
       v.format = "9:16";
       v.type = "short";
       if (demoMap[v.id]) v.demoUrl = demoMap[v.id];
-      if (!v.description) v.description = genViral(v);
+      // sempre regenera se legenda antiga/longa
+      if (!v.description || isOldLongCaption(v.description)) {
+        v.description = genViral(v);
+      }
     });
+    // garantir persistencia das curtas
+    save();
     if (!videos.length) {
       console.warn("No videos in library");
     }
