@@ -1,13 +1,13 @@
 /**
  * Wire TikTok Content Posting API into LUXECUT UI
- * Auto-setup: preenche Client Key + redirect + privacidade.
- * Client Secret NUNCA vai no GitHub — so localStorage apos voce colar 1x.
+ * Auto-setup: redirect + privacidade. Client Key/Secret so no localStorage (voce cola do portal).
+ * Nunca hardcode secret. Client Key antiga pode ser invalida se regenerada no portal.
  */
 (function () {
   const $ = (s) => document.querySelector(s);
 
-  // Client Key do app "Style"/LUXECUT (publico no fluxo OAuth)
   const DEFAULTS = {
+    // sugestao legada — se OAuth falhar com client_key, cole a key ATUAL do portal
     clientKey: "aw6c4eqjlnexy4vw",
     privacyLevel: "PUBLIC_TO_EVERYONE",
     appName: "LUXECUT",
@@ -26,31 +26,82 @@
     if (!el) return;
     el.textContent = m;
     el.classList.add("show");
-    setTimeout(() => el.classList.remove("show"), 2800);
+    setTimeout(() => el.classList.remove("show"), 3200);
+  }
+
+  function showClientKeyError(show, detail) {
+    const ban = $("#ttKeyErrorBanner");
+    if (ban) ban.style.display = show ? "block" : "none";
+    if (show) {
+      log("ERRO client_key: " + (detail || "TikTok rejeitou a Client Key"));
+      try {
+        window.VideoFlowApp?.setView?.("contas");
+      } catch (_) {}
+      const el = $("#ttClientKey");
+      if (el) {
+        el.focus();
+        el.select?.();
+        el.style.outline = "2px solid #ff6b6b";
+        setTimeout(() => (el.style.outline = ""), 6000);
+      }
+    }
+  }
+
+  function normalizeKey(k) {
+    return String(k || "")
+      .trim()
+      .replace(/^["']|["']$/g, "")
+      .replace(/\s+/g, "");
+  }
+
+  function validateClientKey(key) {
+    const k = normalizeKey(key);
+    if (!k) return { ok: false, msg: "Cole a Client Key do portal TikTok (Credentials)." };
+    if (k.length < 10) return { ok: false, msg: "Client Key muito curta — copie de novo do portal." };
+    if (/\s/.test(k)) return { ok: false, msg: "Client Key nao pode ter espacos." };
+    if (/^act\.|secret|bearer/i.test(k)) {
+      return { ok: false, msg: "Isso parece Access Token/Secret. Client Key e o campo Client Key no portal." };
+    }
+    return { ok: true, key: k };
   }
 
   function fillForm() {
     const TT = window.TikTokAPI;
     if (!TT) return;
     const c = TT.loadCfg();
-    // auto-preencher key se vazio
-    const key = c.clientKey || DEFAULTS.clientKey;
+    // nao forcar key morta: so preenche se usuario/localStorage ja tiver
+    const key = c.clientKey || "";
     if ($("#ttClientKey")) $("#ttClientKey").value = key;
     if ($("#ttClientSecret")) $("#ttClientSecret").value = c.clientSecret || "";
     if ($("#ttAccessToken")) $("#ttAccessToken").value = c.accessToken || "";
     if ($("#ttProxyUrl")) $("#ttProxyUrl").value = c.proxyUrl || "";
     if ($("#ttPrivacy")) $("#ttPrivacy").value = c.privacyLevel || DEFAULTS.privacyLevel;
-    if ($("#ttRedirect")) $("#ttRedirect").value = TT.redirectUriDefault();
+    const redirect = TT.redirectUriDefault();
+    if ($("#ttRedirect")) $("#ttRedirect").value = redirect;
+    if ($("#ttRedirectHint")) $("#ttRedirectHint").textContent = redirect;
     const label = $("#ttAccountLabel");
     if (label) {
       label.textContent = c.accessToken
         ? `Conectado${c.openId ? " · open_id " + c.openId : ""}${c.creatorUsername ? " · @" + c.creatorUsername : ""}`
         : key
-          ? "Key pronta · falta Secret + OAuth ou Access Token"
-          : "Desconectado";
+          ? "Key salva · falta Secret + OAuth ou Access Token"
+          : "Desconectado — cole Client Key do portal";
     }
-    // OAuth callback ?code=
+
     const params = new URLSearchParams(location.search);
+    const err = params.get("error") || params.get("error_type");
+    const errDesc = params.get("error_description") || params.get("error_message") || "";
+    if (err || /client_key/i.test(errDesc)) {
+      showClientKeyError(true, err + " " + errDesc);
+      history.replaceState(null, "", location.pathname + location.hash);
+      toast("TikTok rejeitou client_key — cole a key nova do portal");
+      return;
+    }
+    // flag interna se usuario voltou da tela de erro
+    if (sessionStorage.getItem("luxecut_tt_key_err") === "1") {
+      showClientKeyError(true, "Ultimo OAuth falhou com client_key");
+      sessionStorage.removeItem("luxecut_tt_key_err");
+    }
     const code = params.get("code");
     const state = params.get("state");
     if (code && (state === "vf" || !state || state === "luxecut")) {
@@ -67,7 +118,25 @@
     const redirect = TT.redirectUriDefault();
     const existing = TT.loadCfg();
 
-    // Secret: so pede se ainda nao tiver no navegador
+    // Client Key: campo → localStorage → prompt (nao confiar cegamente em key antiga)
+    let key = normalizeKey($("#ttClientKey")?.value || existing.clientKey || "");
+    if (!key) {
+      key = normalizeKey(
+        prompt(
+          "Cole a CLIENT KEY do portal TikTok (Credentials).\n\n" +
+            "Se o login deu erro client_key, abra o portal e copie a chave ATUAL.\n" +
+            "developers.tiktok.com/apps → seu app → Credentials",
+          existing.clientKey || DEFAULTS.clientKey || ""
+        ) || ""
+      );
+    }
+    const vKey = validateClientKey(key);
+    if (!vKey.ok) {
+      showClientKeyError(true, vKey.msg);
+      return toast(vKey.msg);
+    }
+    key = vKey.key;
+
     let secret = existing.clientSecret || ($("#ttClientSecret")?.value || "").trim();
     if (!secret) {
       secret = (prompt(
@@ -79,7 +148,7 @@
     const token = existing.accessToken || ($("#ttAccessToken")?.value || "").trim();
 
     TT.saveCfg({
-      clientKey: DEFAULTS.clientKey,
+      clientKey: key,
       clientSecret: secret || existing.clientSecret || "",
       accessToken: token,
       privacyLevel: DEFAULTS.privacyLevel,
@@ -89,13 +158,14 @@
       autoConfigured: true,
     });
 
-    if ($("#ttClientKey")) $("#ttClientKey").value = DEFAULTS.clientKey;
+    if ($("#ttClientKey")) $("#ttClientKey").value = key;
     if ($("#ttClientSecret") && secret) $("#ttClientSecret").value = secret;
     if ($("#ttPrivacy")) $("#ttPrivacy").value = DEFAULTS.privacyLevel;
     if ($("#ttRedirect")) $("#ttRedirect").value = redirect;
+    showClientKeyError(false);
 
     log("AUTO-SETUP LUXECUT");
-    log("Client Key: " + DEFAULTS.clientKey);
+    log("Client Key: " + key.slice(0, 6) + "…" + key.slice(-4) + " (len " + key.length + ")");
     log("Redirect URI: " + redirect);
     log("Privacy: " + DEFAULTS.privacyLevel);
     log(
@@ -103,12 +173,12 @@
         ? "Client Secret: salvo localmente (ok)"
         : "Client Secret: AINDA FALTA — cole no campo e Salvar"
     );
-    log("No portal TikTok confira:");
-    log("1) App name: LUXECUT");
-    log("2) Redirect URI exatamente: " + redirect);
+    log("Portal TikTok (obrigatorio antes do OAuth):");
+    log("1) Credentials → Client Key = a mesma que voce colou");
+    log("2) Login Kit → Redirect URI EXATA: " + redirect);
     log("3) Products: Login Kit + Content Posting API");
     log("4) Scopes: user.info.basic, video.upload, video.publish");
-    log("5) Save + Submit for review (producao)");
+    log("5) Sandbox: adicione sua conta TikTok como Target user");
 
     const A = window.VideoFlowApp;
     if (A) {
@@ -118,19 +188,22 @@
         user: token ? "@conectando" : "@pendente",
         at: new Date().toISOString(),
         realApi: !!token,
-        clientKey: DEFAULTS.clientKey,
+        clientKey: key,
       };
       A.save();
       A.renderAll?.();
     }
 
     fillForm();
-    toast(secret || token ? "TikTok configurado — use OAuth ou Token" : "Key ok — cole o Secret");
+    toast(secret || token ? "TikTok configurado — use OAuth ou Token" : "Key salva — cole o Secret");
 
-    // se tem secret e nao tem token, oferece OAuth
     if (secret && !token) {
       const go = confirm(
-        "Configuracao salva.\n\nAbrir login OAuth do TikTok agora para gerar Access Token?"
+        "Keys salvas.\n\nANTES do OAuth confira no portal:\n" +
+          "• Client Key igual a que colou\n" +
+          "• Redirect URI:\n" +
+          redirect +
+          "\n\nAbrir login OAuth do TikTok agora?"
       );
       if (go) startOAuth();
     } else if (token) {
@@ -180,14 +253,24 @@
 
   function saveKeys() {
     const TT = window.TikTokAPI;
+    const rawKey = normalizeKey($("#ttClientKey")?.value || "");
+    const v = rawKey ? validateClientKey(rawKey) : { ok: true, key: "" };
+    if (rawKey && !v.ok) {
+      showClientKeyError(true, v.msg);
+      toast(v.msg);
+      return;
+    }
+    if (v.key && $("#ttClientKey")) $("#ttClientKey").value = v.key;
     TT.saveCfg({
-      clientKey: $("#ttClientKey")?.value?.trim() || "",
-      clientSecret: $("#ttClientSecret")?.value?.trim() || "",
-      accessToken: $("#ttAccessToken")?.value?.trim() || "",
-      proxyUrl: $("#ttProxyUrl")?.value?.trim() || "",
+      clientKey: v.key || "",
+      clientSecret: ($("#ttClientSecret")?.value || "").trim(),
+      accessToken: ($("#ttAccessToken")?.value || "").trim(),
+      proxyUrl: ($("#ttProxyUrl")?.value || "").trim(),
       privacyLevel: $("#ttPrivacy")?.value || "PUBLIC_TO_EVERYONE",
+      redirectUri: TT.redirectUriDefault(),
     });
-    log("Keys salvas no navegador (localStorage).");
+    if (v.key) showClientKeyError(false);
+    log("Keys salvas no navegador (localStorage)." + (v.key ? " key len=" + v.key.length : ""));
     toast("Keys TikTok salvas");
     fillForm();
   }
@@ -357,18 +440,47 @@
 
   function startOAuth() {
     const TT = window.TikTokAPI;
-    saveKeys();
-    const clientKey = $("#ttClientKey")?.value?.trim() || TT.loadCfg().clientKey;
-    if (!clientKey) {
-      toast("Cole o Client Key primeiro");
+    const redirect = TT.redirectUriDefault();
+    const raw =
+      normalizeKey($("#ttClientKey")?.value) ||
+      normalizeKey(TT.loadCfg().clientKey) ||
+      "";
+    const v = validateClientKey(raw);
+    if (!v.ok) {
+      showClientKeyError(true, v.msg);
+      toast(v.msg);
       return;
     }
+    if ($("#ttClientKey")) $("#ttClientKey").value = v.key;
+    saveKeys();
+
+    // marca: se o usuario voltar sem code, provavelmente erro de client_key no TikTok
+    sessionStorage.setItem("luxecut_tt_oauth_pending", v.key);
+    sessionStorage.setItem("luxecut_tt_oauth_at", String(Date.now()));
+
+    const ok = confirm(
+      "Vai abrir o login TikTok.\n\n" +
+        "Client Key: " +
+        v.key.slice(0, 6) +
+        "…" +
+        v.key.slice(-4) +
+        "\nRedirect:\n" +
+        redirect +
+        "\n\nSe aparecer erro client_key:\n" +
+        "1) Portal → Credentials → copie a Client Key NOVA\n" +
+        "2) Cole aqui e Salvar\n" +
+        "3) Confirme Redirect URI no Login Kit\n\nContinuar?"
+    );
+    if (!ok) return;
+
     const url = TT.buildAuthorizeUrl({
-      clientKey,
-      redirectUri: TT.redirectUriDefault(),
+      clientKey: v.key,
+      redirectUri: redirect,
+      state: "luxecut",
       scopes: ["user.info.basic", "video.publish", "video.upload"],
     });
-    log("Abrindo OAuth: " + url);
+    log("OAuth client_key=" + v.key.slice(0, 6) + "… redirect=" + redirect);
+    log("URL: " + url);
     location.href = url;
   }
 
@@ -377,15 +489,29 @@
       setTimeout(wire, 100);
       return;
     }
-    // auto: grava client key padrao se ainda nao tiver
+    // so privacy padrao — NAO injeta client_key morta automaticamente
     const cfg = window.TikTokAPI.loadCfg();
-    if (!cfg.clientKey) {
+    if (!cfg.privacyLevel) {
       window.TikTokAPI.saveCfg({
-        clientKey: DEFAULTS.clientKey,
         privacyLevel: DEFAULTS.privacyLevel,
         appName: DEFAULTS.appName,
       });
     }
+    // se voltou da tela de erro TikTok (sem code), mostra banner
+    const pending = sessionStorage.getItem("luxecut_tt_oauth_pending");
+    const pendingAt = Number(sessionStorage.getItem("luxecut_tt_oauth_at") || 0);
+    const params = new URLSearchParams(location.search);
+    if (pending && !params.get("code") && Date.now() - pendingAt < 10 * 60 * 1000) {
+      // usuario pode ter voltado com botao voltar apos erro client_key
+      sessionStorage.setItem("luxecut_tt_key_err", "1");
+      sessionStorage.removeItem("luxecut_tt_oauth_pending");
+      sessionStorage.removeItem("luxecut_tt_oauth_at");
+    } else if (params.get("code")) {
+      sessionStorage.removeItem("luxecut_tt_oauth_pending");
+      sessionStorage.removeItem("luxecut_tt_oauth_at");
+      sessionStorage.removeItem("luxecut_tt_key_err");
+    }
+
     fillForm();
 
     $("#ttSaveKeys")?.addEventListener("click", saveKeys);
