@@ -469,32 +469,88 @@
     }
   }
 
+  function resolveTikTokUsername() {
+    const TT = window.TikTokAPI?.loadCfg?.() || {};
+    const prof = window.LuxeProfile?.loadProfile?.() || {};
+    const fromField = ($("#pfHandle")?.value || "").replace(/^@/, "").trim();
+    const fromAcc = String(state.accounts?.tiktok?.user || "").replace(/^@/, "").trim();
+    const u =
+      TT.creatorUsername ||
+      fromField ||
+      fromAcc ||
+      prof.handle ||
+      "";
+    return String(u).replace(/^@/, "").trim();
+  }
+
+  /** URL do perfil / editar no TikTok */
+  function tiktokProfileUrls(handle) {
+    const h = (handle || resolveTikTokUsername() || "").replace(/^@/, "");
+    return {
+      profile: h ? "https://www.tiktok.com/@" + encodeURIComponent(h) : "https://www.tiktok.com/",
+      edit: "https://www.tiktok.com/setting",
+      me: "https://www.tiktok.com/",
+    };
+  }
+
   function openTikTokEditProfile(handle) {
-    // Web: pagina de edicao (login no browser se necessario)
-    const webEdit = "https://www.tiktok.com/setting";
-    const webProfile = handle
-      ? "https://www.tiktok.com/@" + handle.replace(/^@/, "")
-      : "https://www.tiktok.com/";
-    // deep links mobile / app desktop se instalado
-    const deep = [
-      "snssdk1233://user/profile",
-      "tiktok://user/profile",
-      webEdit,
-    ];
-    // tenta deep link rapido, depois web
+    const urls = tiktokProfileUrls(handle);
+    // tenta app nativo
     try {
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = deep[0];
-      document.body.appendChild(iframe);
-      setTimeout(() => iframe.remove(), 800);
+      const a = document.createElement("a");
+      a.href = "snssdk1233://user/profile";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     } catch (_) {}
-    window.open(webEdit, "_blank", "noopener");
-    setTimeout(() => {
-      // segundo tab com perfil (fallback)
-      // nao força multiplas abas sempre — so se usuario pedir
-    }, 0);
-    return { webEdit, webProfile };
+    // web: editar perfil
+    window.open(urls.edit, "_blank", "noopener");
+    return urls;
+  }
+
+  /** Redireciona (mesma aba) pro perfil do TikTok — o que o usuario pediu */
+  function goMyTikTokProfile(opts = {}) {
+    const sameTab = opts.sameTab !== false;
+    const urls = tiktokProfileUrls();
+    const target = urls.profile;
+    // copia pack antes de ir
+    try {
+      const pack = getIdentityPack();
+      navigator.clipboard?.writeText(
+        `${pack.displayName}\n@${pack.handle}\n\n${pack.bioTt}`
+      );
+    } catch (_) {}
+    toast("Abrindo seu perfil no TikTok…");
+    botSay(
+      `Redirecionando para o TikTok: <a href="${esc(target)}" target="_blank" rel="noopener">${esc(target)}</a><br>` +
+        `Nome/bio copiados — no app: <strong>Editar perfil</strong> e cole.`
+    );
+    if (sameTab) {
+      // pequena pausa pra toast aparecer
+      setTimeout(() => {
+        location.href = target;
+      }, 250);
+    } else {
+      window.open(target, "_blank", "noopener");
+    }
+    return target;
+  }
+
+  function closePfOverlay() {
+    const ov = $("#pfApplyOverlay");
+    if (!ov) return;
+    ov.hidden = true;
+    ov.classList.remove("is-open");
+    ov.setAttribute("aria-hidden", "true");
+  }
+
+  function openPfOverlay() {
+    const ov = $("#pfApplyOverlay");
+    if (!ov) return;
+    ov.hidden = false;
+    ov.classList.add("is-open");
+    ov.setAttribute("aria-hidden", "false");
   }
 
   // wizard state
@@ -588,22 +644,18 @@
       },
     ];
 
-    const ov = $("#pfApplyOverlay");
-    if (ov) ov.hidden = false;
-    renderPfApplySteps();
-
-    // executa passo 0 automatico (download)
-    await runPfApplyStep(0);
-    // passo 1 automatico apos 1.2s (abre TikTok)
-    setTimeout(() => runPfApplyStep(1), 1200);
-
+    // nao trava a tela: copia pack, baixa foto e REDIRECIONA pro perfil
+    try {
+      await autoDownloadUrl(pack.avatarUrl, "luxecut-avatar.jpg");
+    } catch (_) {}
+    await copyText(`${pack.displayName}\n@${pack.handle}\n\n${pack.bioTt}`);
+    toast("Pack copiado — abrindo TikTok");
     botSay(
-      `<strong>Aplicar no TikTok (modo maximo permitido)</strong><br>` +
-        `A API do TikTok <em>proibe</em> apps de mudarem @/nome/bio/foto sozinhos.<br>` +
-        `Eu ja: gerei o perfil, baixei a foto e abri o TikTok com o nome copiado.<br>` +
-        `Voce so cola (Ctrl+V) em cada campo e salva.<br>` +
-        `<code>${esc(pack.handleAt)}</code> · <strong>${esc(pack.displayName)}</strong>`
+      `<strong>Pack pronto</strong> · <code>${esc(pack.handleAt)}</code><br>` +
+        `Foto baixada + texto copiado. Abrindo seu perfil no TikTok agora.`
     );
+    // redireciona pro perfil (mesma aba)
+    setTimeout(() => goMyTikTokProfile({ sameTab: true }), 400);
   }
 
   async function syncRealTikTokProfile() {
@@ -1637,7 +1689,23 @@
 
   /* init bindings */
   function bindUI() {
-    $("#btnEnter")?.addEventListener("click", enterApp);
+    // garante que nenhum overlay bloqueie cliques
+    closePfOverlay();
+    $("#modal")?.classList.remove("open");
+
+    const enter = (e) => {
+      e?.preventDefault?.();
+      enterApp();
+    };
+    $("#btnEnter")?.addEventListener("click", enter);
+    $("#btnEnter2")?.addEventListener("click", enter);
+    $$("[data-view-later]").forEach((el) =>
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        enterApp();
+        setTimeout(() => setView(el.dataset.viewLater || "import"), 80);
+      })
+    );
     $$("[data-view]").forEach((el) =>
       el.addEventListener("click", () => setView(el.dataset.view))
     );
@@ -1707,31 +1775,30 @@
 
     $("#btnCreateProfile")?.addEventListener("click", () => createCreatorProfile(false));
     $("#btnSaveProfile")?.addEventListener("click", saveCreatorProfileFields);
+    $("#btnMyTikTokProfile")?.addEventListener("click", () => goMyTikTokProfile({ sameTab: true }));
     $("#btnApplyTikTokProfile")?.addEventListener("click", () => startApplyTikTokProfile());
     $("#btnSyncTikTokRead")?.addEventListener("click", () => syncRealTikTokProfile());
-    $("#pfApplyClose")?.addEventListener("click", () => {
-      const ov = $("#pfApplyOverlay");
-      if (ov) ov.hidden = true;
+    $("#pfApplyClose")?.addEventListener("click", closePfOverlay);
+    $("#pfApplyOverlay")?.addEventListener("click", (e) => {
+      if (e.target === $("#pfApplyOverlay")) closePfOverlay();
     });
     $("#pfApplyNext")?.addEventListener("click", async () => {
       const next = pfApply.step + 1;
       if (next >= pfApply.steps.length) {
-        $("#pfApplyStatus") && ($("#pfApplyStatus").textContent = "Concluido — salve no TikTok");
-        toast("Pronto — confira se salvou no TikTok");
-        pfApply.step = pfApply.steps.length;
-        renderPfApplySteps();
+        closePfOverlay();
+        goMyTikTokProfile({ sameTab: true });
         return;
       }
       await runPfApplyStep(next);
     });
     $("#pfApplyOpenTT")?.addEventListener("click", () => {
-      openTikTokEditProfile(pfApply.pack?.handle || getIdentityPack().handle);
+      closePfOverlay();
+      goMyTikTokProfile({ sameTab: true });
     });
     $("#pfApplyCopy")?.addEventListener("click", async () => {
-      const s = pfApply.steps[pfApply.step];
-      if (s?.action) await s.action();
-      else await copyText(getIdentityPack().bioTt);
-      toast("Campo copiado");
+      const pack = getIdentityPack();
+      await copyText(`${pack.displayName}\n@${pack.handle}\n\n${pack.bioTt}`);
+      toast("Pack copiado");
     });
     $("#btnRegenHandle")?.addEventListener("click", () => {
       const p = window.LuxeProfile?.regenerateIdentity("handle");
@@ -2014,6 +2081,8 @@
       genViral,
       asset,
       enterApp,
+      goMyTikTokProfile,
+      closePfOverlay,
       clearAllVideos,
       runAutoMix,
       assignCoverToVideo,
@@ -2033,6 +2102,7 @@
     console.info("LUXECUT ready", videos.length, "videos");
     // conta nova / personalizacao
     setTimeout(() => {
+      closePfOverlay();
       refreshAccountUI();
       if (window.LuxeProfile?.isNewAccount()) {
         if (videos.length) {
@@ -2041,7 +2111,6 @@
         } else {
           const banner = document.getElementById("newAccountBanner");
           if (banner) banner.style.display = "block";
-          // gera perfil padrao luxury mesmo sem videos
           if (!window.LuxeProfile.loadProfile()?.profileReady) {
             createCreatorProfile(true);
           }
@@ -2050,6 +2119,16 @@
         createCreatorProfile(true);
       }
       refreshAccountUI();
+
+      // ?go=tiktok ou ?go=profile → entra e redireciona pro perfil TikTok
+      const params = new URLSearchParams(location.search);
+      const go = (params.get("go") || params.get("redirect") || "").toLowerCase();
+      if (go === "tiktok" || go === "profile" || go === "perfil" || go === "me") {
+        try {
+          enterApp();
+        } catch (_) {}
+        setTimeout(() => goMyTikTokProfile({ sameTab: true }), 500);
+      }
     }, 200);
   } catch (err) {
     console.error("VideoFlow boot failed", err);

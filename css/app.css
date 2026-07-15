@@ -135,13 +135,23 @@ a { color: var(--gold2); }
 @media (max-width: 900px) {
   .creator-profile { grid-template-columns: 1fr; }
 }
+/* Overlay NUNCA bloqueia cliques por padrao */
 .pf-apply-overlay {
+  display: none !important;
   position: fixed; inset: 0; z-index: 9999;
   background: rgba(0,0,0,.72);
-  display: flex; align-items: center; justify-content: center;
+  align-items: center; justify-content: center;
   padding: 16px;
+  pointer-events: none;
 }
-.pf-apply-overlay[hidden] { display: none !important; }
+.pf-apply-overlay.is-open {
+  display: flex !important;
+  pointer-events: auto;
+}
+.pf-apply-overlay[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
 .pf-apply-card {
   width: min(520px, 100%);
   background: #141414;
@@ -149,6 +159,7 @@ a { color: var(--gold2); }
   border-radius: 16px;
   padding: 16px 18px 18px;
   box-shadow: 0 20px 60px rgba(0,0,0,.55);
+  pointer-events: auto;
 }
 .pf-apply-top {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;

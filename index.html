@@ -22,7 +22,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="css/app.css?v=prof3" />
+  <link rel="stylesheet" href="css/app.css?v=fixclick1" />
   <link rel="icon" href="assets/icon-luxecut.jpg" />
 </head>
 <body>
@@ -189,7 +189,8 @@
               <h3>Perfil do criador (LUXECUT)</h3>
               <div style="display:flex;flex-wrap:wrap;gap:8px">
                 <button class="btn sm" type="button" id="btnCreateProfile">Gerar perfil completo</button>
-                <button class="btn tiktok sm" type="button" id="btnApplyTikTokProfile">Aplicar no TikTok (auto)</button>
+                <button class="btn tiktok sm" type="button" id="btnMyTikTokProfile">Meu perfil TikTok</button>
+                <button class="btn ghost sm" type="button" id="btnApplyTikTokProfile">Copiar pack + abrir</button>
               </div>
             </div>
             <div class="panel-b">
@@ -228,26 +229,6 @@
             </div>
           </div>
 
-          <!-- Overlay wizard: aplicar perfil no TikTok com o minimo de cliques -->
-          <div id="pfApplyOverlay" class="pf-apply-overlay" hidden>
-            <div class="pf-apply-card">
-              <div class="pf-apply-top">
-                <strong id="pfApplyTitle">Aplicar perfil no TikTok</strong>
-                <button type="button" class="btn ghost sm" id="pfApplyClose">Fechar</button>
-              </div>
-              <p id="pfApplyStatus" class="pf-apply-status">Preparando…</p>
-              <ol id="pfApplySteps" class="pf-apply-steps"></ol>
-              <div class="pf-apply-actions">
-                <button class="btn sm" type="button" id="pfApplyNext">Proximo passo</button>
-                <button class="btn tiktok sm" type="button" id="pfApplyOpenTT">Abrir TikTok</button>
-                <button class="btn ghost sm" type="button" id="pfApplyCopy">Copiar campo atual</button>
-              </div>
-              <p class="note" style="margin-top:10px">
-                TikTok bloqueia apps de editar o perfil sozinhos. Este assistente faz 90% automatico:
-                foto baixada + texto na area de transferencia + pagina de edicao aberta.
-              </p>
-            </div>
-          </div>
           <div id="emptyLibHint" class="note" style="margin-bottom:14px">
             Nenhum video na biblioteca. Va em <strong>Adicionar videos</strong>, depois use <strong>Auto Mix IA</strong>.
             Capas ficam na aba Capas (separadas).
@@ -782,6 +763,23 @@ POST /v2/post/publish/creator_info/query/</div>
       </div>
     </div>
   </div>
+
+  <!-- Overlay fora do shell — so aparece com .is-open -->
+  <div id="pfApplyOverlay" class="pf-apply-overlay" hidden aria-hidden="true">
+    <div class="pf-apply-card" role="dialog" aria-modal="true">
+      <div class="pf-apply-top">
+        <strong id="pfApplyTitle">Aplicar perfil no TikTok</strong>
+        <button type="button" class="btn ghost sm" id="pfApplyClose">Fechar</button>
+      </div>
+      <p id="pfApplyStatus" class="pf-apply-status">Preparando…</p>
+      <ol id="pfApplySteps" class="pf-apply-steps"></ol>
+      <div class="pf-apply-actions">
+        <button class="btn sm" type="button" id="pfApplyNext">Proximo passo</button>
+        <button class="btn tiktok sm" type="button" id="pfApplyOpenTT">Ir pro meu perfil</button>
+        <button class="btn ghost sm" type="button" id="pfApplyCopy">Copiar campo</button>
+      </div>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
 
   <script src="data/library.js?v=clear1"></script>
@@ -792,19 +790,52 @@ POST /v2/post/publish/creator_info/query/</div>
   <script src="js/auto-combine.js?v=niche1"></script>
   <script src="js/editor.js?v=niche1"></script>
   <script src="js/tiktok-api.js?v=token3"></script>
-  <script src="js/app.js?v=prof3"></script>
+  <script src="js/app.js?v=fixclick1"></script>
   <script src="js/editor-bridge.js?v=niche1"></script>
   <script src="js/tiktok-bridge.js?v=token2"></script>
   <script>
-    document.getElementById("btnEnter2")?.addEventListener("click", function () {
-      document.getElementById("btnEnter")?.click();
-    });
-    document.querySelector("[data-view-later]")?.addEventListener("click", function () {
-      document.getElementById("btnEnter")?.click();
-      setTimeout(function () {
-        document.querySelector('[data-view="import"]')?.click();
-      }, 100);
-    });
+    (function () {
+      // fallback se app.js falhar: botoes da landing sempre clicaveis
+      function forceEnter() {
+        var landing = document.getElementById("landing");
+        var shell = document.getElementById("shell");
+        if (landing) landing.classList.add("hidden");
+        if (shell) {
+          shell.classList.add("on");
+          shell.style.display = "grid";
+        }
+        // fecha overlays zumbis
+        var ov = document.getElementById("pfApplyOverlay");
+        if (ov) {
+          ov.hidden = true;
+          ov.classList.remove("is-open");
+        }
+        var modal = document.getElementById("modal");
+        if (modal) modal.classList.remove("open");
+      }
+      document.getElementById("btnEnter")?.addEventListener("click", function () {
+        if (window.VideoFlowApp && typeof window.VideoFlowApp.enterApp === "function") return;
+        forceEnter();
+      });
+      document.getElementById("btnEnter2")?.addEventListener("click", function () {
+        document.getElementById("btnEnter")?.click();
+      });
+      document.querySelectorAll("[data-view-later]").forEach(function (el) {
+        el.addEventListener("click", function () {
+          document.getElementById("btnEnter")?.click();
+        });
+      });
+      // link direto: ?go=tiktok
+      var go = new URLSearchParams(location.search).get("go");
+      if (go === "tiktok" || go === "profile" || go === "perfil") {
+        // se app nao carregar em 1.2s, manda pro TikTok mesmo assim
+        setTimeout(function () {
+          if (!window.VideoFlowReady) {
+            location.href = "https://www.tiktok.com/";
+          }
+        }, 1200);
+      }
+    })();
   </script>
 </body>
 </html>
