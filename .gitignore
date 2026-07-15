@@ -10,3 +10,6 @@ node_modules/
 library/
 ready-9x16/
 posted/
+
+data/*.txt
+data/gh-*
