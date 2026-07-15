@@ -548,6 +548,92 @@ a { color: var(--gold2); }
 .ed-flags { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; font-size: .8rem; color: var(--muted); }
 .ed-flags label { display: flex; gap: 6px; align-items: center; background: rgba(0,0,0,.22); padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); }
 
+/* Pro Max editor extras */
+.auto-bar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin: -4px 0 12px; padding: 10px 12px;
+  background: linear-gradient(90deg, rgba(201,162,39,.12), rgba(254,44,85,.08));
+  border: 1px solid rgba(201,162,39,.25); border-radius: 14px;
+}
+.auto-label {
+  font-size: .68rem; font-weight: 800; letter-spacing: .08em;
+  color: var(--gold2); margin-right: 4px;
+}
+.ed-timeline {
+  padding: 10px 14px; border-bottom: 1px solid var(--line);
+  background: rgba(0,0,0,.25);
+}
+.tl-row { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+.tl-lab {
+  font-size: .7rem; font-weight: 800; color: var(--muted);
+  width: 28px; height: 28px; border-radius: 8px;
+  display: grid; place-items: center; background: rgba(255,255,255,.05);
+}
+.tl-track {
+  position: relative; height: 28px; border-radius: 8px;
+  background: linear-gradient(90deg, rgba(139,124,255,.25), rgba(34,211,238,.15));
+  border: 1px solid var(--line); overflow: hidden;
+}
+.tl-track.music {
+  display: flex; align-items: center; padding: 0 10px;
+  font-size: .72rem; color: var(--muted);
+  background: linear-gradient(90deg, rgba(254,44,85,.18), rgba(201,162,39,.1));
+}
+.tl-track.music.on { color: var(--gold2); }
+.tl-playhead {
+  position: absolute; top: 0; bottom: 0; width: 2px; background: #fff;
+  box-shadow: 0 0 8px #fff; left: 0; z-index: 3;
+}
+.tl-trim-a, .tl-trim-b {
+  position: absolute; top: 0; bottom: 0; background: rgba(0,0,0,.45); z-index: 1;
+}
+.tl-trim-a { left: 0; width: 0; }
+.tl-trim-b { left: 100%; width: 0; }
+.ed-stage.kenburns .ed-frame video {
+  animation: kenburns 12s ease-in-out infinite alternate;
+}
+@keyframes kenburns {
+  from { transform: scale(1.05) translate(0,0); }
+  to { transform: scale(1.18) translate(-2%, -1%); }
+}
+.ed-stage.flash::after {
+  content: ""; position: absolute; inset: 0; background: #fff;
+  animation: flash 0.45s ease-out forwards; pointer-events: none; z-index: 5;
+}
+@keyframes flash {
+  from { opacity: .85; }
+  to { opacity: 0; }
+}
+.ed-vignette {
+  display: none; pointer-events: none; position: absolute; inset: 0; z-index: 2;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,calc(var(--vig, 0) * 0.85)) 100%);
+}
+.ed-stage.vignette-on .ed-vignette { display: block; }
+.ed-text-overlay.stroke {
+  -webkit-text-stroke: 1px rgba(0,0,0,.55);
+}
+.music-search-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 8px;
+}
+.music-search-row input {
+  border-radius: 10px; border: 1px solid var(--line);
+  background: rgba(0,0,0,.28); padding: 10px 12px; outline: none; color: var(--text);
+}
+.music-list {
+  display: grid; gap: 6px; max-height: 200px; overflow: auto; margin-bottom: 10px;
+}
+.music-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+  padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line);
+  background: rgba(0,0,0,.22); cursor: pointer; transition: .15s;
+}
+.music-item:hover, .music-item.on {
+  border-color: rgba(201,162,39,.45); background: rgba(201,162,39,.1);
+}
+.music-item strong { display: block; font-size: .82rem; color: var(--text); }
+.music-item small { color: var(--muted); font-size: .7rem; }
+.ed-panels { max-height: 340px; }
+
 @media (max-width: 1200px) {
   .editor-layout { grid-template-columns: 1fr 1fr; }
 }
