@@ -266,6 +266,140 @@ window.LuxeProfile = (function () {
     };
   }
 
+  /** Gera @, nome de exibicao e bio curta por nicho */
+  function buildIdentity(nicheId, opts = {}) {
+    const niche = getNiche(nicheId || "luxury_cars");
+    const seed = opts.seed || Math.floor(Math.random() * 900) + 100;
+    const handles = {
+      luxury_cars: [
+        "luxecut.garage",
+        "luxecut.drive",
+        "luxecut.fleet",
+        "style.luxecut",
+        "luxecut.cars",
+      ],
+      billionaire: [
+        "luxecut.wealth",
+        "luxecut.mind",
+        "luxecut.rise",
+        "style.luxecut",
+        "luxecut.vip",
+      ],
+      aesthetic: [
+        "luxecut.visual",
+        "luxecut.mood",
+        "luxecut.frame",
+        "style.luxecut",
+      ],
+      reels_geral: [
+        "luxecut.clips",
+        "luxecut.daily",
+        "luxecut.now",
+        "style.luxecut",
+      ],
+    };
+    const names = {
+      luxury_cars: ["LUXECUT Garage", "LUXECUT Drive", "LUXECUT Motors", "Style LUXECUT"],
+      billionaire: ["LUXECUT Wealth", "LUXECUT Mindset", "LUXECUT Elite", "Style LUXECUT"],
+      aesthetic: ["LUXECUT Visual", "LUXECUT Mood", "LUXECUT Frames"],
+      reels_geral: ["LUXECUT", "LUXECUT Clips", "LUXECUT Daily"],
+    };
+    const bios = {
+      luxury_cars: [
+        "Carros. Presenca. Padrao.\nSegue pra mais 9:16",
+        "Luxo sem gritar.\nNovo corte todo dia.",
+        "Garage goals only.\nSegue se e teu estilo.",
+      ],
+      billionaire: [
+        "Mindset de elite.\nSegue pra subir de nivel.",
+        "Energia bilionaria.\nAtiva o sininho.",
+        "Status sem filtro.\nEntra pro clube.",
+      ],
+      aesthetic: [
+        "Visual clean. Vibes.\nSegue o feed.",
+        "Frames que grudam.\nFica se curtiu.",
+      ],
+      reels_geral: [
+        "Cortes que param o scroll.\nSegue pra nao perder.",
+        "Conteudo diario.\nEntra pro clube.",
+      ],
+    };
+    const listH = handles[niche.id] || handles.luxury_cars;
+    const listN = names[niche.id] || names.luxury_cars;
+    const listB = bios[niche.id] || bios.luxury_cars;
+    const handle = opts.handle || listH[seed % listH.length];
+    const displayName = opts.displayName || listN[seed % listN.length];
+    const bio = opts.bio || listB[seed % listB.length];
+    return {
+      handle: handle.replace(/^@/, ""),
+      handleAt: "@" + handle.replace(/^@/, ""),
+      displayName,
+      bio,
+      nicheId: niche.id,
+      nicheLabel: niche.label,
+      avatar: "assets/avatar-luxecut.jpg",
+      cover: "covers/luxecut-brand.jpg",
+      link: "https://rdzindu7.github.io/videoflow-pro/",
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  /** Cria/atualiza perfil completo da conta LUXECUT */
+  function createFullProfile(opts = {}) {
+    let nicheId = opts.nicheId;
+    let detection = null;
+    if (!nicheId && opts.videos) {
+      detection = detectNicheFromVideos(opts.videos);
+      nicheId = detection.nicheId;
+    }
+    nicheId = nicheId || loadProfile()?.niche || "luxury_cars";
+    const identity = buildIdentity(nicheId, opts);
+    applyNiche(nicheId, { detection: detection || { reason: "perfil gerado", confidence: 0.9 } });
+    const profile = saveProfile({
+      onboardingDone: true,
+      isNew: false,
+      identity,
+      handle: identity.handle,
+      handleAt: identity.handleAt,
+      displayName: identity.displayName,
+      bio: identity.bio,
+      avatar: identity.avatar,
+      profileCover: identity.cover,
+      profileLink: identity.link,
+      profileReady: true,
+      profileCreatedAt: new Date().toISOString(),
+    });
+    return { profile, identity, niche: getNiche(nicheId) };
+  }
+
+  function regenerateIdentity(field) {
+    const p = loadProfile() || {};
+    const nicheId = p.niche || "luxury_cars";
+    const fresh = buildIdentity(nicheId, { seed: Date.now() % 1000 });
+    const identity = {
+      ...(p.identity || {}),
+      ...fresh,
+      // keep fields not regenerated unless full
+      handle: field === "handle" || !field ? fresh.handle : p.handle || fresh.handle,
+      handleAt: field === "handle" || !field ? fresh.handleAt : p.handleAt || fresh.handleAt,
+      displayName: field === "name" || !field ? fresh.displayName : p.displayName || fresh.displayName,
+      bio: field === "bio" || !field ? fresh.bio : p.bio || fresh.bio,
+      avatar: p.avatar || fresh.avatar,
+      cover: p.profileCover || fresh.cover,
+    };
+    identity.handleAt = "@" + String(identity.handle || "").replace(/^@/, "");
+    return saveProfile({
+      identity,
+      handle: identity.handle,
+      handleAt: identity.handleAt,
+      displayName: identity.displayName,
+      bio: identity.bio,
+      avatar: identity.avatar,
+      profileCover: identity.cover,
+      profileReady: true,
+    });
+  }
+
   return {
     NICHES,
     PROFILE_KEY,
@@ -279,5 +413,8 @@ window.LuxeProfile = (function () {
     nicheCaption,
     personalizeLibrary,
     summary,
+    buildIdentity,
+    createFullProfile,
+    regenerateIdentity,
   };
 })();

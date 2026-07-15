@@ -286,18 +286,111 @@
     const banner = $("#newAccountBanner");
     const nicheLbl = $("#nicheLabel");
     if (badge) {
-      badge.textContent = isNew ? "Conta nova" : prof?.nicheLabel || "Conta ativa";
+      badge.textContent = isNew
+        ? "Conta nova"
+        : prof?.handleAt || prof?.nicheLabel || "Conta ativa";
       badge.classList.toggle("new", isNew);
     }
-    if (banner) banner.style.display = isNew ? "block" : "none";
+    if (banner) banner.style.display = isNew && !prof?.profileReady ? "block" : "none";
     if (nicheLbl) {
       nicheLbl.textContent = prof?.niche
-        ? `Nicho: ${prof.nicheLabel} · mix ${prof.autoMixStyle}`
+        ? `Nicho: ${prof.nicheLabel} · ${prof.handleAt || ""} · mix ${prof.autoMixStyle}`
         : "Nicho ainda nao definido";
     }
     const sum = P.summary();
     const el = $("#profileSummary");
     if (el) el.textContent = typeof sum === "string" ? sum : sum.text;
+    // perfil criador
+    if (prof) {
+      if ($("#pfHandle")) $("#pfHandle").value = (prof.handle || prof.handleAt || "").replace(/^@/, "");
+      if ($("#pfName")) $("#pfName").value = prof.displayName || "";
+      if ($("#pfBio")) $("#pfBio").value = prof.bio || "";
+      if ($("#pfAvatar") && prof.avatar) $("#pfAvatar").src = asset(prof.avatar);
+      if ($("#pfCoverPrev") && (prof.profileCover || prof.cover))
+        $("#pfCoverPrev").src = asset(prof.profileCover || prof.cover);
+      if ($("#pfPreviewName")) $("#pfPreviewName").textContent = prof.displayName || "LUXECUT";
+      if ($("#pfPreviewAt")) $("#pfPreviewAt").textContent = prof.handleAt || "@luxecut";
+      if ($("#pfPreviewBio")) $("#pfPreviewBio").textContent = prof.bio || "";
+      if ($("#pfAvatarDl") && prof.avatar) {
+        $("#pfAvatarDl").href = asset(prof.avatar);
+      }
+    }
+  }
+
+  function createCreatorProfile(auto = false) {
+    const P = window.LuxeProfile;
+    if (!P) return toast("Perfil nao carregou");
+    const nicheId = $("#nicheSelect")?.value || P.loadProfile()?.niche || "luxury_cars";
+    const { profile, identity, niche } = P.createFullProfile({
+      nicheId,
+      videos,
+      handle: $("#pfHandle")?.value?.trim() || undefined,
+      displayName: $("#pfName")?.value?.trim() || undefined,
+      bio: $("#pfBio")?.value?.trim() || undefined,
+    });
+    // personaliza biblioteca
+    P.personalizeLibrary(videos, profile);
+    // aplica auto mix style
+    if ($("#autoMixStyle") && profile.autoMixStyle) $("#autoMixStyle").value = profile.autoMixStyle;
+    // sincroniza contas tiktok label
+    state.accounts.tiktok = {
+      ...(state.accounts.tiktok || {}),
+      connected: !!state.accounts.tiktok?.realApi || !!state.accounts.tiktok?.connected,
+      user: identity.handleAt,
+      displayName: identity.displayName,
+      bio: identity.bio,
+      avatar: identity.avatar,
+    };
+    save();
+    renderAll();
+    refreshAccountUI();
+    toast("Perfil criado: " + identity.handleAt);
+    botSay(
+      `Perfil gerado para o nicho <strong>${esc(niche.label)}</strong>:<br>` +
+        `<code>${esc(identity.handleAt)}</code> · <strong>${esc(identity.displayName)}</strong><br>` +
+        `<pre class="ai-pre">${esc(identity.bio)}</pre>` +
+        `Foto: <code>assets/avatar-luxecut.jpg</code> — baixe e use no TikTok/IG (API nao cria @ sozinha).`
+    );
+    if (!auto) {
+      $("#newAccountBanner") && ($("#newAccountBanner").style.display = "none");
+    }
+    return profile;
+  }
+
+  function saveCreatorProfileFields() {
+    const P = window.LuxeProfile;
+    if (!P) return;
+    const handle = ($("#pfHandle")?.value || "luxecut").replace(/^@/, "").trim();
+    const displayName = ($("#pfName")?.value || "LUXECUT").trim();
+    const bio = ($("#pfBio")?.value || "").trim();
+    P.saveProfile({
+      handle,
+      handleAt: "@" + handle,
+      displayName,
+      bio,
+      avatar: "assets/avatar-luxecut.jpg",
+      profileCover: "covers/luxecut-brand.jpg",
+      profileReady: true,
+      onboardingDone: true,
+      identity: {
+        ...(P.loadProfile()?.identity || {}),
+        handle,
+        handleAt: "@" + handle,
+        displayName,
+        bio,
+        avatar: "assets/avatar-luxecut.jpg",
+        cover: "covers/luxecut-brand.jpg",
+      },
+    });
+    state.accounts.tiktok = {
+      ...(state.accounts.tiktok || {}),
+      user: "@" + handle,
+      displayName,
+      bio,
+    };
+    save();
+    refreshAccountUI();
+    toast("Perfil salvo");
   }
 
   function runNichePersonalization(forceDetect) {
@@ -1332,6 +1425,36 @@
       const cur = window.LuxeProfile.loadProfile()?.niche;
       if (cur) sel.value = cur;
     }
+
+    $("#btnCreateProfile")?.addEventListener("click", () => createCreatorProfile(false));
+    $("#btnSaveProfile")?.addEventListener("click", saveCreatorProfileFields);
+    $("#btnRegenHandle")?.addEventListener("click", () => {
+      const p = window.LuxeProfile?.regenerateIdentity("handle");
+      refreshAccountUI();
+      toast(p?.handleAt || "Novo @");
+    });
+    $("#btnRegenBio")?.addEventListener("click", () => {
+      const p = window.LuxeProfile?.regenerateIdentity("bio");
+      refreshAccountUI();
+      toast("Nova bio");
+    });
+    $("#btnCopyProfile")?.addEventListener("click", () => {
+      const p = window.LuxeProfile?.loadProfile();
+      if (!p) return;
+      const text = `${p.displayName || ""}\n${p.handleAt || ""}\n\n${p.bio || ""}\n\nFoto: baixe avatar-luxecut.jpg no LUXECUT`;
+      navigator.clipboard?.writeText(text).then(
+        () => toast("Perfil copiado"),
+        () => prompt("Copie:", text)
+      );
+    });
+    // auto-gerar perfil se conta nova e ainda nao tem
+    setTimeout(() => {
+      const P = window.LuxeProfile;
+      if (P && P.isNewAccount() && !P.loadProfile()?.profileReady) {
+        // nao forca ate usuario abrir, mas preenche preview
+        refreshAccountUI();
+      }
+    }, 400);
     $("#btnReassignCovers")?.addEventListener("click", reassignCovers);
     $("#btnReassignCovers2")?.addEventListener("click", reassignCovers);
     $("#btnSimGrowth")?.addEventListener("click", () => {
@@ -1595,12 +1718,21 @@
     setTimeout(() => {
       refreshAccountUI();
       if (window.LuxeProfile?.isNewAccount()) {
-        if (videos.length) runNichePersonalization(true);
-        else {
+        if (videos.length) {
+          runNichePersonalization(true);
+          createCreatorProfile(true);
+        } else {
           const banner = document.getElementById("newAccountBanner");
           if (banner) banner.style.display = "block";
+          // gera perfil padrao luxury mesmo sem videos
+          if (!window.LuxeProfile.loadProfile()?.profileReady) {
+            createCreatorProfile(true);
+          }
         }
+      } else if (window.LuxeProfile && !window.LuxeProfile.loadProfile()?.profileReady) {
+        createCreatorProfile(true);
       }
+      refreshAccountUI();
     }, 200);
   } catch (err) {
     console.error("VideoFlow boot failed", err);
